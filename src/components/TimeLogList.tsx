@@ -4,6 +4,7 @@ import moment from 'moment';
 
 const TODAY_LOGS = gql`
   query {
+    isCheckedIn @client
     getTodayLogs @client {
       id
       date
@@ -19,7 +20,11 @@ export const TimeLogList = () => {
     return <div>Loading....</div>;
   }
 
-  const { getTodayLogs } = data;
+  const { getTodayLogs, isCheckedIn } = data;
+
+  if (!isCheckedIn) {
+    return <div>체크인을 먼저 하세요.</div>;
+  }
 
   console.log('timeLogs', getTodayLogs);
   return (

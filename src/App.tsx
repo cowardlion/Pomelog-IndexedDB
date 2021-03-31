@@ -4,6 +4,7 @@ import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 
 import { TimeLogList } from './components/TimeLogList';
+import { CheckInOutButton } from './components/CheckInOutButton';
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -17,6 +18,7 @@ function App() {
       <div className="App">
         <TimeLogList />
       </div>
+      <CheckInOutButton />
     </ApolloProvider>
   );
 }

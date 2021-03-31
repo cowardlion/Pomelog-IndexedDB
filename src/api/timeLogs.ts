@@ -70,7 +70,7 @@ db.version(1).stores({
 });
 
 const TIME_ZONE = 'YYYY-MM-DDT00:00:00Z';
-const isCheckedInToday = async (mt = moment()) => {
+export const isCheckedInToday = async (mt = moment()) => {
   const today = mt.format(TIME_ZONE);
   const tomorrow = mt.add(1, 'd').format(TIME_ZONE);
 
@@ -155,9 +155,13 @@ export const checkIn = async (date = new Date()) => {
     throw new Error('같은 날짜에 체크인을 두번할 수 없다.');
   }
 
-  return db.table('timeLogs').add({
+  const logValue = {
     date,
     note: 'Check-In',
     tags: ['CHECK-IN'],
-  });
+  };
+
+  const id = await db.table('timeLogs').add(logValue);
+
+  return { id, ...logValue };
 };
