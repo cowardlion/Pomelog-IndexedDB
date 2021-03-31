@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.3.13",
+    "@emotion/react": "^11.1.5",
+    "@emotion/styled": "^11.1.5",
     "dexie": "^3.0.3",
     "graphql": "^15.5.0",
     "moment-timezone": "^0.5.33",
