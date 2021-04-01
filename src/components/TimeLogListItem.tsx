@@ -101,6 +101,11 @@ const ListItemStyled = styled.li`
   border-bottom: 1px dashed #aeaeae;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
+
+  :hover {
+    background-color: aliceblue;
+  }
 
   .content {
     display: flex;
