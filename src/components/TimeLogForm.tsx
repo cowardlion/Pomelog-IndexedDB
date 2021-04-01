@@ -1,5 +1,12 @@
 import { FormEvent } from 'react';
+import { gql, useQuery } from '@apollo/client';
 import styled from '@emotion/styled';
+
+const CHECK_IN_OUT = gql`
+  query {
+    isCheckedIn @client
+  }
+`;
 
 type FormElements = {
   note: HTMLInputElement;
@@ -7,17 +14,21 @@ type FormElements = {
 };
 
 export const TimeLogForm = () => {
+  const { loading, data } = useQuery(CHECK_IN_OUT);
+
   const handleSubmit = (event: FormEvent) => {
     const elements = ((event.target as HTMLFormElement).elements as unknown) as FormElements;
-    const { note, tag } = elements;
+    const { note } = elements;
 
     if (!note.value) {
       alert('필수 입력값이 없습니다.');
       return event.preventDefault();
     }
-
-    console.log('검증할꺼야....', note, tag);
   };
+
+  if (loading || !data.isCheckedIn) {
+    return null;
+  }
 
   return (
     <FormStyled onSubmit={handleSubmit}>
@@ -52,9 +63,7 @@ const FormStyled = styled.form`
     margin-right: 10px;
     width: 100%;
   }
-  input[name='note'] {
-    /* width: 70%; */
-  }
+
   input[name='tag'] {
     width: 35%;
   }

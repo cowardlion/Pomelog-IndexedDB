@@ -1,4 +1,4 @@
-import { listBy, isCheckedInToday, checkIn } from '../api/timeLogs';
+import { listBy, isCheckedInToday, checkIn, remove } from '../api/timeLogs';
 
 const resolvers = {
   Query: {
@@ -13,6 +13,9 @@ const resolvers = {
   Mutation: {
     CheckIn: async () => {
       return await checkIn();
+    },
+    RemoveLog: async (_: any, { id }: any) => {
+      return await remove([id]);
     },
   },
 };

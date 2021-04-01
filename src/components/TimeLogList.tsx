@@ -3,6 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import type { TimeLog } from '../api/timeLogs';
 import moment from 'moment';
 import 'moment/locale/ko';
+import { TimeLogListItem } from './TimeLogListItem';
 moment.locale('ko');
 
 const TODAY_LOGS = gql`
@@ -26,27 +27,19 @@ export const TimeLogList = () => {
   const { getTodayLogs, isCheckedIn } = data;
 
   if (!isCheckedIn) {
-    return <div>체크인을 먼저 하세요.</div>;
+    return (
+      <ListStyled>
+        <div className="message">체크인을 먼저 하세요.</div>
+      </ListStyled>
+    );
   }
 
-  console.log('timeLogs', getTodayLogs);
   return (
     <ListStyled className="TimeLogList">
       <ul>
-        {getTodayLogs.map(({ id, date, note }: TimeLog) => {
-          return (
-            <li key={id}>
-              <div className="content">
-                <strong>{moment(date).format('A h:mm')}</strong>
-                <span>{note}</span>
-              </div>
-
-              <div className="action-btn-group">
-                <button>삭제</button>
-              </div>
-            </li>
-          );
-        })}
+        {getTodayLogs.map((timeLog: TimeLog) => (
+          <TimeLogListItem key={timeLog.id} item={timeLog} />
+        ))}
       </ul>
     </ListStyled>
   );
@@ -55,30 +48,10 @@ export const TimeLogList = () => {
 const ListStyled = styled.div`
   ul {
     list-style: none;
+  }
 
-    li {
-      padding: 10px 0;
-      border-bottom: 1px dashed #aeaeae;
-      display: flex;
-      justify-content: space-between;
-
-      .content {
-        display: flex;
-        align-items: center;
-
-        strong {
-          margin-right: 20px;
-        }
-      }
-
-      .action-btn-group {
-        width: 100px;
-        text-align: right;
-
-        button {
-          padding: 4px 8px;
-        }
-      }
-    }
+  .message {
+    padding: 20px 0 10px 0;
+    text-align: center;
   }
 `;

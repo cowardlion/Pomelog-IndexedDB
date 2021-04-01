@@ -25,6 +25,7 @@ type Query {
 
 type Mutation {
   CheckIn: TimeLog!
+  RemoveLog(input: Int!): Boolean!
 }
 `;
 
