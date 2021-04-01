@@ -5,8 +5,8 @@ export type TimeLog = {
   id: number;
   date: Date;
   note: string;
-  tags?: string[];
-  duration?: number;
+  tags: string[];
+  duration: number;
 };
 
 export type InputLog = Partial<Omit<TimeLog, 'id' | 'duration'>>;
@@ -82,20 +82,20 @@ export const isCheckedInToday = async (mt = moment()) => {
   }
 };
 
-export const listBy = async (today = new Date()) => {
-  const from = moment(today).format(TIME_ZONE);
-  const to = moment(today).add(1, 'd').format(TIME_ZONE);
+export const listBy = async (date = new Date()) => {
+  const from = moment(date).format(TIME_ZONE);
+  const to = moment(date).add(1, 'd').format(TIME_ZONE);
   const logs = await db.table('timeLogs').where('date').between(new Date(from), new Date(to)).sortBy('date');
 
   const timeLogs = logs.map((log: TimeLog, index: number, arr: TimeLog[]) => {
     // 체크인 제외
     if (index === 0) {
-      return log;
+      return { ...log, duration: 0 };
     }
 
     // 체크아웃 제외
     if (index === arr.length - 1 && log.tags?.includes('CHECK-OUT')) {
-      return log;
+      return { ...log, duration: 0 };
     }
 
     return { ...log, duration: log.date.valueOf() - arr[index - 1].date.valueOf() };

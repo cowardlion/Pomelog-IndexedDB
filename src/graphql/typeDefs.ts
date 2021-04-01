@@ -18,13 +18,21 @@ type TimeLog {
   tags: String[]
   duration: Int
 }
+
+type InputLog {
+  date: Date
+  note: String!
+  tag: String
+} 
+
 type Query {
-  getTodayLogs: [TimeLog]
+  timeLogs(input: Date): [TimeLog]!
   isCheckedIn: Boolean!
 }
 
 type Mutation {
   CheckIn: TimeLog!
+  AddLog(input: InputLog!)
   RemoveLog(input: Int!): Boolean!
 }
 `;

@@ -18,7 +18,7 @@ export const CheckInOutButton = () => {
     update(cache, { data: { CheckIn } }) {
       cache.modify({
         fields: {
-          getTodayLogs() {
+          timeLogs() {
             return [CheckIn];
           },
           isCheckedIn() {

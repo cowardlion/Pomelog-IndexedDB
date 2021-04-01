@@ -1,10 +1,16 @@
 import { FormEvent } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import styled from '@emotion/styled';
 
 const CHECK_IN_OUT = gql`
   query {
     isCheckedIn @client
+  }
+`;
+
+const ADD_TIME_LOG = gql`
+  mutation AddLog($input: InputLog!) {
+    AddLog(input: $input) @client
   }
 `;
 
@@ -15,15 +21,42 @@ type FormElements = {
 
 export const TimeLogForm = () => {
   const { loading, data } = useQuery(CHECK_IN_OUT);
+  const [addLogMutation] = useMutation(ADD_TIME_LOG);
 
   const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
     const elements = ((event.target as HTMLFormElement).elements as unknown) as FormElements;
-    const { note } = elements;
+    const { note, tag } = elements;
 
     if (!note.value) {
       alert('필수 입력값이 없습니다.');
-      return event.preventDefault();
+      return;
     }
+
+    const newLog = { date: new Date(), note: note.value, tag: tag.value.split(',') };
+
+    addLogMutation({
+      variables: {
+        input: newLog,
+      },
+      update(cache, { data }) {
+        const logId = data.AddLog;
+
+        cache.modify({
+          fields: {
+            timeLogs(existingLogs) {
+              return [...existingLogs, { id: logId, ...newLog }];
+            },
+            isCheckedIn() {
+              return true;
+            },
+          },
+        });
+
+        note.value = '';
+      },
+    });
   };
 
   if (loading || !data.isCheckedIn) {

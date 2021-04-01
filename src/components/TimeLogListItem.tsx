@@ -8,10 +8,11 @@ moment.locale('ko');
 const TODAY_LOGS = gql`
   query {
     isCheckedIn @client
-    getTodayLogs @client {
+    timeLogs @client {
       id
       date
       note
+      duration
     }
   }
 `;
@@ -28,10 +29,34 @@ type Props = {
 
 type RootQuery = {
   isCheckedIn: boolean;
-  getTodayLogs: TimeLog[];
+  timeLogs: TimeLog[];
 };
 
-export const TimeLogListItem = ({ item: { id, note, date } }: Props) => {
+const msToTime = (s: number) => {
+  if (s === 0) {
+    return null;
+  }
+
+  const ms = s % 1000;
+  s = (s - ms) / 1000;
+  const secs = s % 60;
+  s = (s - secs) / 60;
+  const mins = s % 60;
+  const hrs = (s - mins) / 60;
+
+  let timeStr = '';
+  if (hrs) {
+    timeStr += hrs + '시간 ';
+  }
+
+  if (mins) {
+    timeStr += mins + '분 ';
+  }
+
+  return timeStr;
+};
+
+export const TimeLogListItem = ({ item: { id, note, date, duration } }: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
   const handleDeleteLog = () => {
     removeLogMutation({
@@ -39,12 +64,12 @@ export const TimeLogListItem = ({ item: { id, note, date } }: Props) => {
       optimisticResponse: true,
       update(cache) {
         const data = cache.readQuery({ query: TODAY_LOGS });
-        const { getTodayLogs } = data as RootQuery;
-        const newLogs = getTodayLogs.filter((log) => log.id !== id);
+        const { timeLogs } = data as RootQuery;
+        const newLogs = timeLogs.filter((log) => log.id !== id);
 
         cache.modify({
           fields: {
-            getTodayLogs() {
+            timeLogs() {
               return newLogs;
             },
             isCheckedIn() {
@@ -63,7 +88,8 @@ export const TimeLogListItem = ({ item: { id, note, date } }: Props) => {
         <span>{note}</span>
       </div>
 
-      <div className="action-btn-group">
+      <div className="meta">
+        <span className="duration">{msToTime(duration)}</span>
         <button onClick={handleDeleteLog}>삭제</button>
       </div>
     </ListItemStyled>
@@ -85,9 +111,16 @@ const ListItemStyled = styled.li`
     }
   }
 
-  .action-btn-group {
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100px;
     text-align: right;
+
+    .duration {
+      font-size: 14px;
+    }
 
     button {
       padding: 4px 8px;

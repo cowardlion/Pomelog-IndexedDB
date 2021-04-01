@@ -9,10 +9,11 @@ moment.locale('ko');
 const TODAY_LOGS = gql`
   query {
     isCheckedIn @client
-    getTodayLogs @client {
+    timeLogs @client {
       id
       date
       note
+      duration
     }
   }
 `;
@@ -24,7 +25,7 @@ export const TimeLogList = () => {
     return <div>Loading....</div>;
   }
 
-  const { getTodayLogs, isCheckedIn } = data;
+  const { timeLogs, isCheckedIn } = data;
 
   if (!isCheckedIn) {
     return (
@@ -37,7 +38,7 @@ export const TimeLogList = () => {
   return (
     <ListStyled className="TimeLogList">
       <ul>
-        {getTodayLogs.map((timeLog: TimeLog) => (
+        {timeLogs.map((timeLog: TimeLog) => (
           <TimeLogListItem key={timeLog.id} item={timeLog} />
         ))}
       </ul>

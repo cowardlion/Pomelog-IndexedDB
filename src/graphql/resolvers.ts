@@ -1,10 +1,9 @@
-import { listBy, isCheckedInToday, checkIn, remove } from '../api/timeLogs';
+import { listBy, isCheckedInToday, checkIn, remove, add } from '../api/timeLogs';
 
 const resolvers = {
   Query: {
-    getTodayLogs: async (parent: any, args: any, context: any, info: any) => {
-      const timeLogs = await listBy();
-      return timeLogs;
+    timeLogs: async (parent: any, args: any, context: any, info: any) => {
+      return await listBy();
     },
     isCheckedIn: async (parent: any, args: any, context: any, info: any) => {
       return await isCheckedInToday();
@@ -13,6 +12,9 @@ const resolvers = {
   Mutation: {
     CheckIn: async () => {
       return await checkIn();
+    },
+    AddLog: async (_: any, { input }: any) => {
+      return await add({ ...input });
     },
     RemoveLog: async (_: any, { id }: any) => {
       return await remove([id]);

@@ -11,7 +11,19 @@ import { TimeLogForm } from './components/TimeLogForm';
 import { DateNavigator } from './components/DateNavigator';
 
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      State: {
+        fields: {
+          currentDate: {
+            read(_, { variables }) {
+              return new Date();
+            },
+          },
+        },
+      },
+    },
+  }),
   typeDefs,
   resolvers,
 });

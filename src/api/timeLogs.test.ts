@@ -124,7 +124,7 @@ describe('데이터 검증', () => {
     const date = new Date('2021-03-23');
     const logs = await listBy(date);
 
-    expect(logs[0].duration).toBeUndefined();
+    expect(logs[0].duration).toBe(0);
     expect(logs[0].tags).toContain('CHECK-IN');
   });
 
@@ -142,7 +142,7 @@ describe('데이터 검증', () => {
     for (let i = 1; i < logs.length - 1; ++i) {
       const log = logs[i];
 
-      expect(log.duration).not.toBeUndefined();
+      expect(log.duration).not.toBe(0);
     }
   });
 
@@ -152,28 +152,28 @@ describe('데이터 검증', () => {
     let checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBeUndefined();
+    expect(checkOut.duration).toBe(0);
 
     date = new Date('2021-03-24');
     logs = await listBy(date);
     checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBeUndefined();
+    expect(checkOut.duration).toBe(0);
 
     date = new Date('2021-03-25');
     logs = await listBy(date);
     checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBeUndefined();
+    expect(checkOut.duration).toBe(0);
 
     date = new Date('2021-03-26');
     logs = await listBy(date);
     checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBeUndefined();
+    expect(checkOut.duration).toBe(0);
   });
 });
 
