@@ -171,5 +171,5 @@ export const checkIn = async (date = new Date()) => {
 
   const id = await db.table('timeLogs').add(logValue);
 
-  return { id, ...logValue };
+  return { id, ...logValue, duration: 0 };
 };

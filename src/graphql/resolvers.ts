@@ -2,15 +2,17 @@ import { listByDate, isCheckedInByDate, checkIn, remove, add } from '../api/time
 
 const resolvers = {
   Query: {
-    timeLogs: async (parent: any, args: any, context: any, info: any) => {
-      return await listByDate(new Date(args.date));
+    timeLogs: async (parent: any, { dateStr }: any, context: any, info: any) => {
+      return await listByDate(new Date(dateStr));
     },
-    isCheckedIn: async (parent: any, args: any, context: any, info: any) => {
-      return await isCheckedInByDate(new Date(args.date));
+    isCheckedIn: async (parent: any, { dateStr }: any, context: any, info: any) => {
+      return await isCheckedInByDate(new Date(dateStr));
     },
   },
   Mutation: {
-    checkIn: async () => {
+    checkIn: async (_: any, { dateStr }: any) => {
+      console.log('--->', dateStr);
+
       return await checkIn();
     },
     addLog: async (_: any, { input }: any) => {

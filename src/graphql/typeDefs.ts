@@ -32,7 +32,7 @@ type Query {
 }
 
 type Mutation {
-  checkIn: TimeLog!
+  checkIn(dateStr: String!): TimeLog!
   addLog(input: InputLog!): ID
   removeLog(id: ID!): ID
 }

@@ -2,33 +2,42 @@ import { gql, useMutation } from '@apollo/client';
 import { Button } from 'antd';
 
 const CHECK_IN = gql`
-  mutation {
-    CheckIn @client
+  mutation CheckIn($dateStr: String!) {
+    checkIn(dateStr: $dateStr) @client
   }
 `;
 
 type Props = {
+  dateStr: string;
   isCheckedIn: boolean;
 };
 
-export const CheckInOutButton = ({ isCheckedIn }: Props) => {
-  const [checkIn] = useMutation(CHECK_IN, {
-    update(cache, { data: { CheckIn } }) {
-      cache.modify({
-        fields: {
-          timeLogs() {
-            return [CheckIn];
-          },
-          isCheckedIn() {
-            return true;
-          },
-        },
-      });
-    },
-  });
+export const CheckInOutButton = ({ dateStr, isCheckedIn }: Props) => {
+  console.log('체크인..', dateStr);
+
+  const [checkInMutation] = useMutation(CHECK_IN);
 
   const handleCheckIn = () => {
-    checkIn();
+    checkInMutation({
+      variables: { dateStr },
+      optimisticResponse: true,
+      update(cache, { data: { checkIn } }) {
+        if (!checkIn) {
+          return;
+        }
+
+        cache.modify({
+          fields: {
+            timeLogs() {
+              return [checkIn];
+            },
+            isCheckedIn() {
+              return true;
+            },
+          },
+        });
+      },
+    });
   };
 
   return isCheckedIn ? <Button>체크아웃</Button> : <Button onClick={handleCheckIn}>체크인</Button>;

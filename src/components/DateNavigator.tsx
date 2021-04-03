@@ -35,7 +35,7 @@ export const DateNavigator = ({ dateStr: currentDateStr, onChangeDate }: Props) 
         timeLogs,
       },
       variables: {
-        date,
+        dateStr: currentDateStr,
       },
     });
 

@@ -10,8 +10,8 @@ import { TIME_LOGS } from '../graphql/queries';
 moment.locale('ko');
 
 const REMOVE_LOG = gql`
-  mutation RemoveLog($input: Int!) {
-    removeLog(id: $input) @client
+  mutation RemoveLog($id: ID!) {
+    removeLog(id: $id) @client
   }
 `;
 
@@ -30,10 +30,10 @@ export const TimeLogListItem = ({ dateStr, item: { id, note, date, duration } }:
 
   const handleDeleteLog = () => {
     removeLogMutation({
-      variables: { input: id },
+      variables: { id },
       optimisticResponse: true,
       update(cache) {
-        const data = cache.readQuery({ query: TIME_LOGS, variables: { date: dateStr } });
+        const data = cache.readQuery({ query: TIME_LOGS, variables: { dateStr } });
         const { timeLogs } = data as RootQuery;
         const newLogs = timeLogs.filter((log) => log.id !== id);
 

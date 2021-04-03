@@ -18,7 +18,7 @@ function App() {
     return currentDateStr;
   });
 
-  const { loading, data } = useQuery(TIME_LOGS, { variables: { date: currentDateStr } });
+  const { loading, data } = useQuery(TIME_LOGS, { variables: { dateStr: currentDateStr } });
 
   if (loading) {
     return null;
@@ -33,7 +33,7 @@ function App() {
       <TimeLogList dateStr={currentDateStr} isPast={isPast} isCheckedIn={isCheckedIn} items={timeLogs} />
       {isCheckedIn && <TimeLogForm startAt={timeLogs[timeLogs.length - 1].date} />}
       <TagAutomationButton />
-      {!isPast && <CheckInOutButton isCheckedIn={isCheckedIn} />}
+      {!isPast && <CheckInOutButton dateStr={currentDateStr} isCheckedIn={isCheckedIn} />}
     </div>
   );
 }
