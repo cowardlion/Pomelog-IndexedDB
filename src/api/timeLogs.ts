@@ -9,7 +9,12 @@ export type TimeLog = {
   duration: number;
 };
 
-export type InputLog = Partial<Omit<TimeLog, 'id' | 'duration'>>;
+export type InputLog = Partial<{
+  date: Date;
+  note: String;
+  tag: String;
+}>;
+
 export type MatchLog = Partial<{
   id: number;
   date: Date;
@@ -130,12 +135,12 @@ export const add = async (input: InputLog) => {
     throw new Error('체크인 하기 전에는 기록할 수 없다.');
   }
 
-  const { date = new Date(), note, tags } = input;
+  const { date = new Date(), note, tag } = input;
 
   return db.table('timeLogs').add({
     date,
     note,
-    tags,
+    tags: tag ? tag.split(',').map((s) => s.trim()) : [],
   });
 };
 

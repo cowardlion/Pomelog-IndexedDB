@@ -2,10 +2,16 @@ import { FormEvent, useRef } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import styled from '@emotion/styled';
 import { Button, Input } from 'antd';
+import moment from 'moment';
+import 'moment/locale/ko';
+moment.locale('ko');
 
-const CHECK_IN_OUT = gql`
+const TIME_LOGS = gql`
   query {
     isCheckedIn @client
+    timeLogs @client {
+      date
+    }
   }
 `;
 
@@ -21,7 +27,7 @@ type FormElements = {
 };
 
 export const TimeLogForm = () => {
-  const { loading, data } = useQuery(CHECK_IN_OUT);
+  const { loading, data } = useQuery(TIME_LOGS);
   const [addLogMutation] = useMutation(ADD_TIME_LOG);
   const noteRef = useRef<Input | null>(null);
   const tagRef = useRef<Input | null>(null);
@@ -32,12 +38,14 @@ export const TimeLogForm = () => {
     const elements = ((event.target as HTMLFormElement).elements as unknown) as FormElements;
     const { note, tag } = elements;
 
+    console.log('--->', note.value, tag.value);
+
     if (!note.value) {
       alert('필수 입력값이 없습니다.');
       return;
     }
 
-    const newLog = { date: new Date(), note: note.value, tag: tag.value.split(',') };
+    const newLog = { date: new Date(), note: note.value, tag: tag.value };
 
     addLogMutation({
       variables: {
@@ -67,56 +75,58 @@ export const TimeLogForm = () => {
     return null;
   }
 
+  const lastLog = data.timeLogs[data.timeLogs.length - 1];
+
   return (
-    <FormStyled onSubmit={handleSubmit}>
-      <div className="left">
-        <Input ref={noteRef} name="note" size={'middle'} placeholder="방금 무슨일을 했나요?" bordered={false} />
-        <Input ref={tagRef} name="tag" size={'small'} placeholder="태그를 입력하세요." bordered={false} />
-      </div>
-      <div className="right">
-        <Button type="primary" htmlType="submit">
-          기록하기
-        </Button>
-      </div>
+    <FormStyled>
+      <form onSubmit={handleSubmit}>
+        <div className="inputs">
+          <Input ref={noteRef} width={'100%'} name="note" placeholder="무슨일을 했나요?" bordered={false} />
+          <Input ref={tagRef} name="tag" placeholder="태그를 입력하세요." bordered={false} />
+        </div>
+        <div className="meta">
+          <div>
+            <span>{moment(lastLog.date).format('A h:mm')} 부터</span>
+            <span> ~ </span>
+            <span>{moment().format('A h:mm')} 까지</span>
+          </div>
+          <div className="right">
+            <Button type="primary" htmlType="submit">
+              기록하기
+            </Button>
+          </div>
+        </div>
+      </form>
     </FormStyled>
   );
 };
 
-const FormStyled = styled.form`
-  padding: 5px;
-  border: 1px solid #dedede;
-  border-radius: 3px;
-  margin-bottom: 10px;
-  display: flex;
-
-  .left {
-    flex: 1;
-
-    input[name='note'] {
-      padding: 5px;
-      border: none;
-      border-bottom: 1px solid #ededed;
-      width: 100%;
-    }
-
-    input[name='tag'] {
-      border: none;
-      padding: 5px;
-
-      :focus {
-        border: none;
-      }
-    }
-  }
-
-  .right {
-    width: 100px;
+const FormStyled = styled.div`
+  form {
+    padding: 5px;
+    border: 1px solid #dedede;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    margin-bottom: 10px;
 
-    button {
-      height: 50px;
+    .inputs {
+      flex: 1;
+      border-bottom: 1px dashed #dedede;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8em;
+      color: gray;
+      padding: 5px 0 0 10px;
+
+      .right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
   }
 `;

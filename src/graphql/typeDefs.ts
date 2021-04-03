@@ -32,8 +32,8 @@ type Query {
 
 type Mutation {
   CheckIn: TimeLog!
-  AddLog(input: InputLog!)
-  RemoveLog(input: Int!): Boolean!
+  AddLog(input: InputLog!): ID
+  RemoveLog(input: Int!): ID
 }
 `;
 

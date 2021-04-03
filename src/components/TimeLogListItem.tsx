@@ -4,9 +4,10 @@ import { Button } from 'antd';
 import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLogs';
+import { msToTime } from '../utils';
 moment.locale('ko');
 
-const TODAY_LOGS = gql`
+const TIME_LOGS = gql`
   query {
     isCheckedIn @client
     timeLogs @client {
@@ -34,38 +35,15 @@ type RootQuery = {
   timeLogs: TimeLog[];
 };
 
-const msToTime = (s: number) => {
-  if (s === 0) {
-    return null;
-  }
-
-  const ms = s % 1000;
-  s = (s - ms) / 1000;
-  const secs = s % 60;
-  s = (s - secs) / 60;
-  const mins = s % 60;
-  const hrs = (s - mins) / 60;
-
-  let timeStr = '';
-  if (hrs) {
-    timeStr += hrs + '시간 ';
-  }
-
-  if (mins) {
-    timeStr += mins + '분 ';
-  }
-
-  return timeStr;
-};
-
 export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
+
   const handleDeleteLog = () => {
     removeLogMutation({
       variables: { input: id },
       optimisticResponse: true,
       update(cache) {
-        const data = cache.readQuery({ query: TODAY_LOGS });
+        const data = cache.readQuery({ query: TIME_LOGS });
         const { timeLogs } = data as RootQuery;
         const newLogs = timeLogs.filter((log) => log.id !== id);
 
@@ -86,12 +64,15 @@ export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Pr
   console.log('tags', tags);
 
   return (
-    <ListItemStyled className="TimeLogList">
+    <ListItemStyled>
       <div className="content">
-        <strong>{moment(date).format('A h:mm')}</strong>
-        <span>{note}</span>
+        <div className="date">
+          <strong>{moment(date).format('A h:mm')}</strong>
+        </div>
+        <div className="note">
+          <div>{note}</div>
+        </div>
       </div>
-
       <div className="meta">
         <span className="duration">{msToTime(duration)}</span>
         <Button onClick={handleDeleteLog}>삭제</Button>
@@ -101,11 +82,11 @@ export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Pr
 };
 
 const ListItemStyled = styled.li`
-  padding: 10px 0;
   border-bottom: 1px dashed #aeaeae;
   display: flex;
   justify-content: space-between;
   cursor: pointer;
+  height: 50px;
 
   :hover {
     background-color: aliceblue;
@@ -114,9 +95,14 @@ const ListItemStyled = styled.li`
   .content {
     display: flex;
     align-items: center;
+    flex: 1;
 
-    strong {
-      margin-right: 20px;
+    .date {
+      width: 90px;
+    }
+
+    .note {
+      flex: 1;
     }
   }
 

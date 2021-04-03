@@ -6,7 +6,7 @@ import 'moment/locale/ko';
 import { TimeLogListItem } from './TimeLogListItem';
 moment.locale('ko');
 
-const TODAY_LOGS = gql`
+const TIME_LOGS = gql`
   query {
     isCheckedIn @client
     timeLogs @client {
@@ -14,12 +14,13 @@ const TODAY_LOGS = gql`
       date
       note
       duration
+      tags
     }
   }
 `;
 
 export const TimeLogList = () => {
-  const { loading, data } = useQuery(TODAY_LOGS);
+  const { loading, data } = useQuery(TIME_LOGS);
 
   if (loading) {
     return <div>Loading....</div>;

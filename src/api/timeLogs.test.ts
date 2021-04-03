@@ -110,6 +110,24 @@ describe('기록', () => {
     expect(log?.duration).toBeGreaterThan(1000);
     expect(log?.duration).toBeLessThan(1100);
   });
+
+  test('태그(tag)가 없으면 배열로 저장된다', async () => {
+    const date = new Date();
+    await add({ date, note: '태그 테스트' });
+
+    const log = await find({ date });
+    expect(log.note).toEqual('태그 테스트');
+    expect(log.tags).toEqual([]);
+  });
+
+  test('문자열 태그(tag)가 입력되면 콤마(,)로 분리해서 배열로 저장한다.', async () => {
+    const date = new Date();
+    await add({ date, note: '태그 테스트', tag: '작업 ' });
+
+    const log = await find({ date });
+    expect(log?.note).toEqual('태그 테스트');
+    expect(log?.tags).toEqual(['작업']);
+  });
 });
 
 describe('데이터 검증', () => {
