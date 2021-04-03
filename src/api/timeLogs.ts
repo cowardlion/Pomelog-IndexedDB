@@ -75,7 +75,8 @@ db.version(1).stores({
 });
 
 const TIME_ZONE = 'YYYY-MM-DDT00:00:00Z';
-export const isCheckedInToday = async (mt = moment()) => {
+export const isCheckedInByDate = async (date = new Date()) => {
+  const mt = moment(date);
   const today = mt.format(TIME_ZONE);
   const tomorrow = mt.add(1, 'd').format(TIME_ZONE);
 
@@ -93,17 +94,19 @@ export const listByDate = async (date = new Date()) => {
   const logs = await db.table('timeLogs').where('date').between(new Date(from), new Date(to)).sortBy('date');
 
   const timeLogs = logs.map((log: TimeLog, index: number, arr: TimeLog[]) => {
+    const { tags = [], ...rest } = log;
+
     // 체크인 제외
     if (index === 0) {
-      return { ...log, duration: 0 };
+      return { ...rest, duration: 0, tags };
     }
 
     // 체크아웃 제외
-    if (index === arr.length - 1 && log.tags?.includes('CHECK-OUT')) {
-      return { ...log, duration: 0 };
+    if (index === arr.length - 1 && tags.includes('CHECK-OUT')) {
+      return { ...rest, duration: 0, tags };
     }
 
-    return { ...log, duration: log.date.valueOf() - arr[index - 1].date.valueOf() };
+    return { ...rest, tags, duration: log.date.valueOf() - arr[index - 1].date.valueOf() };
   });
 
   return timeLogs;
@@ -129,7 +132,7 @@ export const find = async (match: MatchLog): Promise<TimeLog> => {
 };
 
 export const add = async (input: InputLog) => {
-  const isCheckedIn = await isCheckedInToday();
+  const isCheckedIn = await isCheckedInByDate();
 
   if (!isCheckedIn) {
     throw new Error('체크인 하기 전에는 기록할 수 없다.');
@@ -154,7 +157,7 @@ export const remove = async (ids: number[]): Promise<void> => {
 };
 
 export const checkIn = async (date = new Date()) => {
-  const isCheckedIn = await isCheckedInToday(moment(date));
+  const isCheckedIn = await isCheckedInByDate(date);
 
   if (isCheckedIn) {
     throw new Error('같은 날짜에 체크인을 두번할 수 없다.');

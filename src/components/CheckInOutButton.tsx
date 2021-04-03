@@ -1,11 +1,5 @@
-import { gql, useQuery, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Button } from 'antd';
-
-const CHECK_IN_OUT = gql`
-  query {
-    isCheckedIn @client
-  }
-`;
 
 const CHECK_IN = gql`
   mutation {
@@ -13,8 +7,11 @@ const CHECK_IN = gql`
   }
 `;
 
-export const CheckInOutButton = () => {
-  const { loading, data } = useQuery(CHECK_IN_OUT);
+type Props = {
+  isCheckedIn: boolean;
+};
+
+export const CheckInOutButton = ({ isCheckedIn }: Props) => {
   const [checkIn] = useMutation(CHECK_IN, {
     update(cache, { data: { CheckIn } }) {
       cache.modify({
@@ -33,12 +30,6 @@ export const CheckInOutButton = () => {
   const handleCheckIn = () => {
     checkIn();
   };
-
-  if (loading) {
-    return null;
-  }
-
-  const { isCheckedIn } = data;
 
   return isCheckedIn ? <Button>체크아웃</Button> : <Button onClick={handleCheckIn}>체크인</Button>;
 };

@@ -5,28 +5,18 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLogs';
 import { msToTime } from '../utils';
-moment.locale('ko');
+import { TIME_LOGS } from '../graphql/queries';
 
-const TIME_LOGS = gql`
-  query {
-    isCheckedIn @client
-    timeLogs @client {
-      id
-      date
-      note
-      duration
-      tags
-    }
-  }
-`;
+moment.locale('ko');
 
 const REMOVE_LOG = gql`
   mutation RemoveLog($input: Int!) {
-    RemoveLog(id: $input) @client
+    removeLog(id: $input) @client
   }
 `;
 
 type Props = {
+  dateStr: string;
   item: TimeLog;
 };
 
@@ -35,7 +25,7 @@ type RootQuery = {
   timeLogs: TimeLog[];
 };
 
-export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Props) => {
+export const TimeLogListItem = ({ dateStr, item: { id, note, date, duration } }: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
 
   const handleDeleteLog = () => {
@@ -43,7 +33,7 @@ export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Pr
       variables: { input: id },
       optimisticResponse: true,
       update(cache) {
-        const data = cache.readQuery({ query: TIME_LOGS });
+        const data = cache.readQuery({ query: TIME_LOGS, variables: { date: dateStr } });
         const { timeLogs } = data as RootQuery;
         const newLogs = timeLogs.filter((log) => log.id !== id);
 
@@ -60,8 +50,6 @@ export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Pr
       },
     });
   };
-
-  console.log('tags', tags);
 
   return (
     <ListItemStyled>

@@ -1,23 +1,15 @@
 import { FormEvent, useRef } from 'react';
-import { gql, useQuery, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
+
 import styled from '@emotion/styled';
 import { Button, Input } from 'antd';
 import moment from 'moment';
 import 'moment/locale/ko';
 moment.locale('ko');
 
-const TIME_LOGS = gql`
-  query {
-    isCheckedIn @client
-    timeLogs @client {
-      date
-    }
-  }
-`;
-
 const ADD_TIME_LOG = gql`
   mutation AddLog($input: InputLog!) {
-    AddLog(input: $input) @client
+    addLog(input: $input) @client
   }
 `;
 
@@ -26,8 +18,11 @@ type FormElements = {
   tag: HTMLInputElement;
 };
 
-export const TimeLogForm = () => {
-  const { loading, data } = useQuery(TIME_LOGS);
+type Props = {
+  startAt: Date;
+};
+
+export const TimeLogForm = ({ startAt }: Props) => {
   const [addLogMutation] = useMutation(ADD_TIME_LOG);
   const noteRef = useRef<Input | null>(null);
   const tagRef = useRef<Input | null>(null);
@@ -37,8 +32,6 @@ export const TimeLogForm = () => {
 
     const elements = ((event.target as HTMLFormElement).elements as unknown) as FormElements;
     const { note, tag } = elements;
-
-    console.log('--->', note.value, tag.value);
 
     if (!note.value) {
       alert('필수 입력값이 없습니다.');
@@ -71,12 +64,6 @@ export const TimeLogForm = () => {
     });
   };
 
-  if (loading || !data.isCheckedIn) {
-    return null;
-  }
-
-  const lastLog = data.timeLogs[data.timeLogs.length - 1];
-
   return (
     <FormStyled>
       <form onSubmit={handleSubmit}>
@@ -86,7 +73,7 @@ export const TimeLogForm = () => {
         </div>
         <div className="meta">
           <div>
-            <span>{moment(lastLog.date).format('A h:mm')} 부터</span>
+            <span>{moment(startAt).format('A h:mm')} 부터</span>
             <span> ~ </span>
             <span>{moment().format('A h:mm')} 까지</span>
           </div>

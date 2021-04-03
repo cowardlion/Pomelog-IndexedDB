@@ -26,14 +26,15 @@ type InputLog {
 } 
 
 type Query {
-  timeLogs(input: Date): [TimeLog]!
-  isCheckedIn: Boolean!
+  timeLogs(date: Date!): [TimeLog]!
+  isCheckedIn(date: Date!): Boolean!
+  currentDateStr: String!
 }
 
 type Mutation {
-  CheckIn: TimeLog!
-  AddLog(input: InputLog!): ID
-  RemoveLog(input: Int!): ID
+  checkIn: TimeLog!
+  addLog(input: InputLog!): ID
+  removeLog(id: ID!): ID
 }
 `;
 
