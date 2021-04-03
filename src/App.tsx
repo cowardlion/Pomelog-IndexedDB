@@ -1,5 +1,4 @@
-import './App.css';
-import styled from '@emotion/styled';
+import './App.less';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
@@ -31,19 +30,15 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
-      <AppStyled className="App">
+      <div className="App">
         <DateNavigator />
         <TimeLogList />
         <TimeLogForm />
         <TagAutomationButton />
         <CheckInOutButton />
-      </AppStyled>
+      </div>
     </ApolloProvider>
   );
 }
-
-const AppStyled = styled.div`
-  padding: 20px;
-`;
 
 export default App;

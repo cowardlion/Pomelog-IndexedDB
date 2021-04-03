@@ -1,9 +1,9 @@
-import { listBy, isCheckedInToday, checkIn, remove, add } from '../api/timeLogs';
+import { listByDate, isCheckedInToday, checkIn, remove, add } from '../api/timeLogs';
 
 const resolvers = {
   Query: {
     timeLogs: async (parent: any, args: any, context: any, info: any) => {
-      return await listBy();
+      return await listByDate();
     },
     isCheckedIn: async (parent: any, args: any, context: any, info: any) => {
       return await isCheckedInToday();

@@ -82,7 +82,7 @@ export const isCheckedInToday = async (mt = moment()) => {
   }
 };
 
-export const listBy = async (date = new Date()) => {
+export const listByDate = async (date = new Date()) => {
   const from = moment(date).format(TIME_ZONE);
   const to = moment(date).add(1, 'd').format(TIME_ZONE);
   const logs = await db.table('timeLogs').where('date').between(new Date(from), new Date(to)).sortBy('date');
@@ -106,7 +106,7 @@ export const listBy = async (date = new Date()) => {
 
 export const find = async (match: MatchLog): Promise<TimeLog> => {
   const { id, date, note, tag } = match;
-  const logs = (await listBy(date)) as TimeLog[];
+  const logs = (await listByDate(date)) as TimeLog[];
 
   for (let i = 0; i < logs.length; ++i) {
     const log = logs[i];

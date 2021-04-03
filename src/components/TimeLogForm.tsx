@@ -1,6 +1,7 @@
-import { FormEvent } from 'react';
+import { FormEvent, useRef } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import styled from '@emotion/styled';
+import { Button, Input } from 'antd';
 
 const CHECK_IN_OUT = gql`
   query {
@@ -22,6 +23,8 @@ type FormElements = {
 export const TimeLogForm = () => {
   const { loading, data } = useQuery(CHECK_IN_OUT);
   const [addLogMutation] = useMutation(ADD_TIME_LOG);
+  const noteRef = useRef<Input | null>(null);
+  const tagRef = useRef<Input | null>(null);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -54,7 +57,8 @@ export const TimeLogForm = () => {
           },
         });
 
-        note.value = '';
+        noteRef.current?.setValue('');
+        tagRef.current?.setValue('');
       },
     });
   };
@@ -66,43 +70,53 @@ export const TimeLogForm = () => {
   return (
     <FormStyled onSubmit={handleSubmit}>
       <div className="left">
-        <input name="note" type="text" placeholder="방금 무슨일을 했나요?" />
-        <input name="tag" type="text" placeholder="태그를 입력하세요." />
+        <Input ref={noteRef} name="note" size={'middle'} placeholder="방금 무슨일을 했나요?" bordered={false} />
+        <Input ref={tagRef} name="tag" size={'small'} placeholder="태그를 입력하세요." bordered={false} />
       </div>
       <div className="right">
-        <input type="submit" value="기록하기" />
+        <Button type="primary" htmlType="submit">
+          기록하기
+        </Button>
       </div>
     </FormStyled>
   );
 };
 
 const FormStyled = styled.form`
-  padding: 10px 0;
+  padding: 5px;
+  border: 1px solid #dedede;
+  border-radius: 3px;
+  margin-bottom: 10px;
   display: flex;
-  justify-content: space-between;
 
   .left {
-    display: flex;
-    width: 100%;
+    flex: 1;
+
+    input[name='note'] {
+      padding: 5px;
+      border: none;
+      border-bottom: 1px solid #ededed;
+      width: 100%;
+    }
+
+    input[name='tag'] {
+      border: none;
+      padding: 5px;
+
+      :focus {
+        border: none;
+      }
+    }
   }
+
   .right {
     width: 100px;
-  }
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  input[type='text'] {
-    padding: 10px 0;
-    border: none;
-    border-bottom: 1px solid #222;
-    margin-right: 10px;
-    width: 100%;
-  }
-
-  input[name='tag'] {
-    width: 35%;
-  }
-
-  input[type='submit'] {
-    width: 100px;
-    padding: 10px;
+    button {
+      height: 50px;
+    }
   }
 `;

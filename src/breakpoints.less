@@ -1,0 +1,41 @@
+/*
+ABOUT BREAKPOINT MIXINS
+These are mad awesome. Feel free to add more if you find things acting wierd at a certain
+screen size or zoom point. I am using em's based on 16px. Ideally if you aren't using a breakpoint
+that means whatever you are working with should look good on a mobile device. 
+ 
+Please refer to the LESS docs on how to use Mixins with Rulesets:
+http://lesscss.org/features/#detached-rulesets-feature
+*/
+ 
+/*
+LARGER MOBILE DEVICES
+~481px+
+*/
+.bp-mobile(@rules) {
+	@media only screen and (max-width: 28.75em) { @rules(); } 
+}
+ 
+/*
+TABLET & SMALLER LAPTOPS
+~768px+
+*/
+.bp-tablet(@rules) {
+	@media only screen and (min-width: 40.5em) { @rules(); }
+}
+ 
+/*
+DESKTOP
+~1030px+
+*/
+.bp-desktop(@rules) {
+	@media only screen and (min-width: 64.375em) { @rules(); }
+}
+ 
+/*
+LARGE VIEWING SIZE
+~1240px+
+*/
+.bp-large-screen(@rules) {
+	@media only screen and (min-width: 77.5em) { @rules(); }
+}

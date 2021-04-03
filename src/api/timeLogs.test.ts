@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { db, checkIn, add, find, listBy, update, remove, setupSampleDB } from './timeLogs';
+import { db, checkIn, add, find, listByDate, update, remove, setupSampleDB } from './timeLogs';
 
 const delay = (second: number) =>
   new Promise((resolve) => {
@@ -64,7 +64,7 @@ describe('조회', () => {
 
   test('지정된 날짜에 해당하는 모두 로그를 조회한다.', async () => {
     const date = new Date('2021-03-24');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
     const [year, month, days] = [date.getFullYear(), date.getMonth(), date.getDate()];
 
     expect.assertions(7 * 3);
@@ -79,7 +79,7 @@ describe('조회', () => {
 
   test('시간순으로 기록하지 않더라도 날짜순으로 정렬해서 보여진다.', async () => {
     const date = new Date('2021-03-25');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
 
     for (let i = 1; i < logs.length; ++i) {
       const prev = logs[i - 1];
@@ -122,7 +122,7 @@ describe('데이터 검증', () => {
   });
   test('지정된 날짜의 최초 기록은 항상 체크인으로 시작해야한다.', async () => {
     const date = new Date('2021-03-23');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
 
     expect(logs[0].duration).toBe(0);
     expect(logs[0].tags).toContain('CHECK-IN');
@@ -130,14 +130,14 @@ describe('데이터 검증', () => {
 
   test('지정된 날짜의 체크인은 유일해야한다.', async () => {
     const date = new Date('2021-03-24');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
     const checkIns = logs.filter(({ tags }) => tags?.includes('CHECK-IN'));
     expect(checkIns.length).toBe(1);
   });
 
   test('체크인과 체크아웃을 제외한 모든 기록은 duration을 가져야한다.', async () => {
     const date = new Date('2021-03-24');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
 
     for (let i = 1; i < logs.length - 1; ++i) {
       const log = logs[i];
@@ -148,28 +148,28 @@ describe('데이터 검증', () => {
 
   test('지난 기록에는 반드시 체크아웃이 있어야한다.', async () => {
     let date = new Date('2021-03-23');
-    let logs = await listBy(date);
+    let logs = await listByDate(date);
     let checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
     expect(checkOut.duration).toBe(0);
 
     date = new Date('2021-03-24');
-    logs = await listBy(date);
+    logs = await listByDate(date);
     checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
     expect(checkOut.duration).toBe(0);
 
     date = new Date('2021-03-25');
-    logs = await listBy(date);
+    logs = await listByDate(date);
     checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
     expect(checkOut.duration).toBe(0);
 
     date = new Date('2021-03-26');
-    logs = await listBy(date);
+    logs = await listByDate(date);
     checkOut = logs[logs.length - 1];
 
     expect(checkOut.tags).toContain('CHECK-OUT');
@@ -190,7 +190,7 @@ describe('삭제', () => {
 
   test('ID를 기준으로 단건을 삭제할수있다.', async () => {
     const date = new Date('2021-03-23');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
     const log = logs[0];
 
     await remove([log.id]);
@@ -204,10 +204,10 @@ describe('삭제', () => {
   });
   test('ID를 기준으로 여러건을 삭제할수있다.', async () => {
     const date = new Date('2021-03-23');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
 
     await remove(logs.map(({ id }) => id));
-    const results = await listBy(date);
+    const results = await listByDate(date);
 
     expect(results.length).toBe(0);
   });
@@ -224,7 +224,7 @@ describe('수정', () => {
   });
   test('ID를 기준으로 기록을 수정할수있다.', async () => {
     const date = new Date('2021-03-23');
-    const logs = await listBy(date);
+    const logs = await listByDate(date);
     const log = logs[0];
 
     const updatedLog = await update(log.id, { note: '체크인 수정' });

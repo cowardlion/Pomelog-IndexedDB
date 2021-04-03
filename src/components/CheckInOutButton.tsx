@@ -1,4 +1,5 @@
 import { gql, useQuery, useMutation } from '@apollo/client';
+import { Button } from 'antd';
 
 const CHECK_IN_OUT = gql`
   query {
@@ -39,5 +40,5 @@ export const CheckInOutButton = () => {
 
   const { isCheckedIn } = data;
 
-  return isCheckedIn ? <button>체크아웃</button> : <button onClick={handleCheckIn}>체크인</button>;
+  return isCheckedIn ? <Button>체크아웃</Button> : <Button onClick={handleCheckIn}>체크인</Button>;
 };

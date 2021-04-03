@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { gql, useMutation } from '@apollo/client';
+import { Button } from 'antd';
 import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLogs';
@@ -13,6 +14,7 @@ const TODAY_LOGS = gql`
       date
       note
       duration
+      tags
     }
   }
 `;
@@ -56,7 +58,7 @@ const msToTime = (s: number) => {
   return timeStr;
 };
 
-export const TimeLogListItem = ({ item: { id, note, date, duration } }: Props) => {
+export const TimeLogListItem = ({ item: { id, note, date, duration, tags } }: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
   const handleDeleteLog = () => {
     removeLogMutation({
@@ -81,6 +83,8 @@ export const TimeLogListItem = ({ item: { id, note, date, duration } }: Props) =
     });
   };
 
+  console.log('tags', tags);
+
   return (
     <ListItemStyled className="TimeLogList">
       <div className="content">
@@ -90,7 +94,7 @@ export const TimeLogListItem = ({ item: { id, note, date, duration } }: Props) =
 
       <div className="meta">
         <span className="duration">{msToTime(duration)}</span>
-        <button onClick={handleDeleteLog}>삭제</button>
+        <Button onClick={handleDeleteLog}>삭제</Button>
       </div>
     </ListItemStyled>
   );
@@ -120,11 +124,11 @@ const ListItemStyled = styled.li`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100px;
+    width: 110px;
     text-align: right;
 
     .duration {
-      font-size: 14px;
+      font-size: 0.8em;
     }
 
     button {
