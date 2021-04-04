@@ -1,5 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
 import { Button } from 'antd';
+import { LogoutOutlined, LoginOutlined } from '@ant-design/icons';
 
 const CHECK_IN = gql`
   mutation CheckIn($dateStr: String!) {
@@ -10,9 +11,10 @@ const CHECK_IN = gql`
 type Props = {
   dateStr: string;
   isCheckedIn: boolean;
+  onClick?: () => void;
 };
 
-export const CheckInOutButton = ({ dateStr, isCheckedIn }: Props) => {
+export const CheckInButton = ({ dateStr, isCheckedIn, onClick }: Props) => {
   const [checkInMutation] = useMutation(CHECK_IN);
 
   const handleCheckIn = () => {
@@ -34,9 +36,17 @@ export const CheckInOutButton = ({ dateStr, isCheckedIn }: Props) => {
             },
           },
         });
+
+        onClick?.();
       },
     });
   };
 
-  return isCheckedIn ? <Button>체크아웃</Button> : <Button onClick={handleCheckIn}>체크인</Button>;
+  return isCheckedIn ? (
+    <Button icon={<LogoutOutlined />}>체크아웃</Button>
+  ) : (
+    <Button icon={<LoginOutlined />} onClick={handleCheckIn}>
+      체크인
+    </Button>
+  );
 };

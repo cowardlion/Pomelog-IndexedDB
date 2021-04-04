@@ -1,12 +1,12 @@
 import { FormEvent, useRef, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-
 import styled from '@emotion/styled';
 import { Button, Input, TimePicker, Switch, Tooltip } from 'antd';
 import { SwapRightOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { getEndAtFromtStartAt } from '../utils';
+import { CheckInButton } from './CheckInButton';
 moment.locale('ko');
 
 const TIME_FORMAT = 'A h:mm';
@@ -138,11 +138,29 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
           </div>
         </div>
         <div className="body">
-          <Input ref={noteRef} width={'100%'} name="note" placeholder="무슨일을 했나요?" bordered={false} />
+          <Input
+            ref={noteRef}
+            width={'100%'}
+            name="note"
+            size="large"
+            placeholder="무슨일을 했나요?"
+            bordered={false}
+            autoFocus={true}
+          />
           <Input ref={tagRef} name="tag" placeholder="태그를 입력하세요." bordered={false} />
         </div>
         <div className="footer">
-          <div></div>
+          <div>
+            {!disableAutoSelect && (
+              <CheckInButton
+                dateStr={dateStr}
+                isCheckedIn={false}
+                onClick={() => {
+                  setStartDateAt(new Date());
+                }}
+              />
+            )}
+          </div>
           <div className="right">
             <Button type="primary" htmlType="submit">
               기록하기
@@ -155,8 +173,9 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
 };
 
 const FormStyled = styled.div`
+  background-color: aliceblue;
+
   form {
-    padding: 5px;
     border: 1px solid #cdcdcd;
     border-radius: 3px;
     display: flex;
@@ -168,9 +187,9 @@ const FormStyled = styled.div`
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 5px 5px 10px;
+      padding: 10px;
       font-size: 0.8em;
-      border-bottom: 1px dashed #dedede;
+      border-bottom: 1px solid #dedede;
       color: gray;
       height: 50px;
 
@@ -197,7 +216,18 @@ const FormStyled = styled.div`
 
     .body {
       flex: 1;
-      border-bottom: 1px dashed #dedede;
+      padding: 0 10px;
+      background-color: #fff;
+      border-bottom: 1px solid #dedede;
+
+      input[name='note'] {
+        border-bottom: 1px dashed #dedede;
+        padding: 10px;
+      }
+
+      input[name='tag'] {
+        padding: 10px;
+      }
     }
 
     .footer {
@@ -206,7 +236,7 @@ const FormStyled = styled.div`
       align-items: center;
       font-size: 0.8em;
       color: gray;
-      padding: 5px 0 0 10px;
+      padding: 5px;
 
       .right {
         display: flex;

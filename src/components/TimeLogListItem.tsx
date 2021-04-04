@@ -70,8 +70,9 @@ const ListItemStyled = styled.li`
   border-bottom: 1px dashed #aeaeae;
   display: flex;
   justify-content: space-between;
-  cursor: pointer;
   height: 50px;
+  padding: 0 10px;
+  cursor: pointer;
 
   &.invalid {
     background-color: goldenrod;

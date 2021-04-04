@@ -8,13 +8,12 @@ moment.locale('ko');
 
 type Props = {
   dateStr: string;
-  isPast: boolean;
-  isCheckedIn: boolean;
   items: TimeLog[];
 };
 
-export const TimeLogList = ({ isPast, isCheckedIn, items, dateStr }: Props) => {
+export const TimeLogList = ({ items, dateStr }: Props) => {
   const isEmpty = items.length === 0;
+  const noBottomBorder = 3 < items.length;
 
   return (
     <ListStyled className="TimeLogList">
@@ -23,7 +22,7 @@ export const TimeLogList = ({ isPast, isCheckedIn, items, dateStr }: Props) => {
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="남겨진 기록이 없습니다." />
         </div>
       ) : (
-        <ul>
+        <ul className={noBottomBorder ? 'bottom-border-line' : ''}>
           {items.map((item: TimeLog) => (
             <TimeLogListItem key={item.id} dateStr={dateStr} item={item} />
           ))}
@@ -34,8 +33,19 @@ export const TimeLogList = ({ isPast, isCheckedIn, items, dateStr }: Props) => {
 };
 
 const ListStyled = styled.div`
+  background-color: cornsilk;
+  border: 1px solid #383838;
+  min-height: 200px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  padding: 0;
+
   ul {
     list-style: none;
+
+    &.bottom-border-line li:last-child {
+      border: none;
+    }
   }
 
   .message {

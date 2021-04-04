@@ -13,8 +13,9 @@ type Props = {
 };
 
 export const DateNavigator = ({ dateStr: currentDateStr, onChangeDate }: Props) => {
+  const disableNextDay = moment().format('YYYY-MM-DD') === currentDateStr;
   const currentDate = moment(new Date(currentDateStr));
-  const dateStr = currentDate.format('LL dddd');
+  const dateStr = currentDate.format('LL');
 
   const handleChangeDate = async (amount: -1 | 1) => {
     currentDate.add(amount, 'day');
@@ -49,9 +50,12 @@ export const DateNavigator = ({ dateStr: currentDateStr, onChangeDate }: Props) 
       </div>
       <div>
         <h1>{dateStr}</h1>
+        <sub>{currentDate.format('dddd')}</sub>
       </div>
       <div className="btn-group">
-        <Button onClick={() => handleChangeDate(1)}>다음</Button>
+        <Button disabled={disableNextDay} onClick={() => handleChangeDate(1)}>
+          다음
+        </Button>
       </div>
     </NavigatorStyled>
   );
@@ -62,7 +66,11 @@ const NavigatorStyled = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
-  border-bottom: 1px solid #383838;
+  padding: 20px 0;
+
+  h1 {
+    font-size: 1.4em;
+  }
 
   .btn-group {
     padding: 0 20px;
