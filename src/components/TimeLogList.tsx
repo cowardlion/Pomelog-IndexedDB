@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Empty } from 'antd';
 import type { TimeLog } from '../api/timeLogs';
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -13,16 +14,20 @@ type Props = {
 };
 
 export const TimeLogList = ({ isPast, isCheckedIn, items, dateStr }: Props) => {
+  const isEmpty = items.length === 0;
+
   return (
     <ListStyled className="TimeLogList">
-      {isCheckedIn ? (
+      {isEmpty ? (
+        <div>
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="남겨진 기록이 없습니다." />
+        </div>
+      ) : (
         <ul>
           {items.map((item: TimeLog) => (
             <TimeLogListItem key={item.id} dateStr={dateStr} item={item} />
           ))}
         </ul>
-      ) : (
-        <div className="message">{isPast ? '남긴 기록이 없습니다.' : '체크인을 먼저 하세요.'}</div>
       )}
     </ListStyled>
   );

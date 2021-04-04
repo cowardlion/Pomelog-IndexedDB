@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider, ApolloClient } from '@apollo/client';
+import { ConfigProvider } from 'antd';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 import cache from './graphql/cache';
@@ -8,6 +9,9 @@ import cache from './graphql/cache';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+import 'moment/locale/ko';
+import locale from 'antd/lib/locale/ko_KR';
 
 const client = new ApolloClient({
   cache,
@@ -18,7 +22,9 @@ const client = new ApolloClient({
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <ConfigProvider locale={locale}>
+        <App />
+      </ConfigProvider>
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById('root')

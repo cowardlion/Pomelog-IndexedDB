@@ -25,7 +25,7 @@ type RootQuery = {
   timeLogs: TimeLog[];
 };
 
-export const TimeLogListItem = ({ dateStr, item: { id, note, date, duration } }: Props) => {
+export const TimeLogListItem = ({ dateStr, item: { id, note, endAt, duration, isValid } }: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
 
   const handleDeleteLog = () => {
@@ -42,9 +42,6 @@ export const TimeLogListItem = ({ dateStr, item: { id, note, date, duration } }:
             timeLogs() {
               return newLogs;
             },
-            isCheckedIn() {
-              return newLogs.length === 0 ? false : true;
-            },
           },
         });
       },
@@ -52,17 +49,17 @@ export const TimeLogListItem = ({ dateStr, item: { id, note, date, duration } }:
   };
 
   return (
-    <ListItemStyled>
+    <ListItemStyled className={isValid ? '' : 'invalid'}>
       <div className="content">
         <div className="date">
-          <strong>{moment(date).format('A h:mm')}</strong>
+          <strong>{moment(endAt).format('A h:mm')}</strong>
         </div>
         <div className="note">
           <div>{note}</div>
         </div>
       </div>
       <div className="meta">
-        <span className="duration">{msToTime(duration)}</span>
+        {isValid ? <span className="duration">{msToTime(duration)}</span> : <span>시간이 겹칩니다.</span>}
         <Button onClick={handleDeleteLog}>삭제</Button>
       </div>
     </ListItemStyled>
@@ -75,6 +72,20 @@ const ListItemStyled = styled.li`
   justify-content: space-between;
   cursor: pointer;
   height: 50px;
+
+  &.invalid {
+    background-color: goldenrod;
+
+    .meta {
+      width: auto;
+      color: #d12323;
+      font-size: 0.9em;
+
+      > span {
+        margin-right: 10px;
+      }
+    }
+  }
 
   :hover {
     background-color: aliceblue;

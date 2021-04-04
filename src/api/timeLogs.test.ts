@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto';
+import moment from 'moment';
 import { db, checkIn, add, find, listByDate, update, remove, setupSampleDB } from './timeLogs';
 
 const delay = (second: number) =>
@@ -17,39 +18,42 @@ describe('체크인', () => {
     await db.table('timeLogs').clear();
   });
 
-  test('체크인 하면 날짜와 시간이 기록되지만 기간(duration)은 없다.', async () => {
+  test('체크인(출근)인 현재 시간으로 시작과 종료를 기록하고 기간(duration)은 0으로 설정된다.', async () => {
     const date = new Date();
     await checkIn(date);
-    const log = await db.table('timeLogs').get({ date });
-    expect(log.date).toEqual(date);
-    expect(log.duration).toBeUndefined();
+    const log = await db.table('timeLogs').get({ endAt: date });
+    expect(log.startAt).toEqual(date);
+    expect(log.endAt).toEqual(date);
+    expect(log.duration).toBe(0);
   });
 
-  test('체크인 하기 전에는 기록할 수 없다.', async () => {
-    expect.assertions(1);
-
-    try {
-      await add({});
-    } catch (ex) {
-      expect(ex).toEqual(Error('체크인 하기 전에는 기록할 수 없다.'));
-    }
-  });
-
-  test('같은 날짜에 체크인을 두번할 수 없다.', async () => {
-    expect.assertions(1);
-    await checkIn(new Date('2021-03-28T15:24:00+0900'));
+  test('체크인 기능은 당일만 가능하다.', async () => {
+    expect.assertions(2);
 
     try {
       await checkIn(new Date('2021-03-28T16:24:00+0900'));
     } catch (ex) {
-      expect(ex).toEqual(Error('같은 날짜에 체크인을 두번할 수 없다.'));
+      expect(ex).toEqual(Error('간편 체크인 기능은 오늘만 가능하다.'));
     }
+
+    try {
+      await checkIn(new Date('2022-03-28T16:24:00+0900'));
+    } catch (ex) {
+      expect(ex).toEqual(Error('간편 체크인 기능은 오늘만 가능하다.'));
+    }
+
+    await checkIn(new Date());
   });
 
-  test('서로 다른 날짜에 체크인은 가능하다.', async () => {
-    expect.assertions(0);
-    await checkIn(new Date('2021-03-28T15:24:00+0900'));
-    await checkIn(new Date('2021-03-28T24:00:00+0900'));
+  test('같은 날짜에 체크인을 두번할 수 없다.', async () => {
+    expect.assertions(1);
+    await checkIn();
+
+    try {
+      await checkIn();
+    } catch (ex) {
+      expect(ex).toEqual(Error('같은 날짜에 체크인을 두번할 수 없다.'));
+    }
   });
 });
 
@@ -67,9 +71,9 @@ describe('조회', () => {
     const logs = await listByDate(date);
     const [year, month, days] = [date.getFullYear(), date.getMonth(), date.getDate()];
 
-    expect.assertions(7 * 3);
+    expect.assertions(4 * 3);
     for (let i = 1; i < logs.length; ++i) {
-      const current = logs[i].date;
+      const current = logs[i].endAt;
 
       expect(current.getFullYear()).toBe(year);
       expect(current.getMonth()).toBe(month);
@@ -78,14 +82,15 @@ describe('조회', () => {
   });
 
   test('시간순으로 기록하지 않더라도 날짜순으로 정렬해서 보여진다.', async () => {
-    const date = new Date('2021-03-25');
+    const date = new Date('2021-03-24');
     const logs = await listByDate(date);
 
+    expect.hasAssertions();
     for (let i = 1; i < logs.length; ++i) {
       const prev = logs[i - 1];
       const current = logs[i];
 
-      expect(prev.date.valueOf()).toBeLessThan(current.date.valueOf());
+      expect(prev.endAt.valueOf()).toBeLessThan(current.endAt.valueOf());
     }
   });
 });
@@ -99,34 +104,50 @@ describe('기록', () => {
     await db.table('timeLogs').clear();
   });
 
-  test('바로 직전에 했던 일을 기록하면 그 일을 했던 시간(duration)이 자동으로 계산된다.', async () => {
-    await delay(1);
-    const date = new Date();
-    await add({ date, note: '테스트' });
+  test('기록을 위해서는 startAt, note 정보가 필요하다.', async () => {
+    expect.assertions(1);
 
-    const log = await find({ date });
-    expect(log?.note).toEqual('테스트');
-    expect(log?.duration).not.toBeUndefined();
-    expect(log?.duration).toBeGreaterThan(1000);
-    expect(log?.duration).toBeLessThan(1100);
+    try {
+      await add({ startAt: new Date(), note: '' });
+    } catch (ex) {
+      expect(ex).toEqual(Error('기록을 위한 필수 데이터가 없습니다.'));
+    }
+  });
+
+  test('바로 직전에 했던 일을 기록하면 그 일을 했던 시간(duration)이 ms으로 자동 계산된다.', async () => {
+    const mtNow = moment();
+    const endAt = new Date();
+    const startAt = mtNow.add(-1, 'hour').toDate();
+
+    await add({ startAt, endAt, note: '테스트', tag: '' });
+
+    const log = await find({ endAt });
+    expect(log.note).toEqual('테스트');
+    expect(log.duration).toBe(3600000);
   });
 
   test('태그(tag)가 없으면 배열로 저장된다', async () => {
-    const date = new Date();
-    await add({ date, note: '태그 테스트' });
+    const mtNow = moment();
+    const endAt = new Date();
+    const startAt = mtNow.add(-1, 'hour').toDate();
 
-    const log = await find({ date });
-    expect(log.note).toEqual('태그 테스트');
+    await add({ startAt, endAt, note: '태그 테스트' });
+
+    const log = await find({ endAt });
     expect(log.tags).toEqual([]);
+    expect(log.note).toEqual('태그 테스트');
   });
 
   test('문자열 태그(tag)가 입력되면 콤마(,)로 분리해서 배열로 저장한다.', async () => {
-    const date = new Date();
-    await add({ date, note: '태그 테스트', tag: '작업 ' });
+    const mtNow = moment();
+    const endAt = new Date();
+    const startAt = mtNow.add(-1, 'hour').toDate();
 
-    const log = await find({ date });
-    expect(log?.note).toEqual('태그 테스트');
-    expect(log?.tags).toEqual(['작업']);
+    await add({ startAt, endAt, note: '태그 테스트2', tag: '작업 ' });
+
+    const log = await find({ endAt });
+    expect(log.note).toEqual('태그 테스트2');
+    expect(log.tags).toEqual(['작업']);
   });
 });
 
@@ -138,12 +159,18 @@ describe('데이터 검증', () => {
   afterAll(async () => {
     await db.table('timeLogs').clear();
   });
-  test('지정된 날짜의 최초 기록은 항상 체크인으로 시작해야한다.', async () => {
+  test('모든 기록은 id, startAt, endAt, note, tags, duration, isValid 필드 값이 항상 존재해야한다.', async () => {
     const date = new Date('2021-03-23');
     const logs = await listByDate(date);
 
-    expect(logs[0].duration).toBe(0);
-    expect(logs[0].tags).toContain('CHECK-IN');
+    logs.forEach((log) => {
+      expect(log.id).not.toBeUndefined();
+      expect(log.startAt).not.toBeUndefined();
+      expect(log.endAt).not.toBeUndefined();
+      expect(log.note).not.toBeUndefined();
+      expect(log.tags).not.toBeUndefined();
+      expect(log.isValid).not.toBeUndefined();
+    });
   });
 
   test('지정된 날짜의 체크인은 유일해야한다.', async () => {
@@ -162,36 +189,6 @@ describe('데이터 검증', () => {
 
       expect(log.duration).not.toBe(0);
     }
-  });
-
-  test('지난 기록에는 반드시 체크아웃이 있어야한다.', async () => {
-    let date = new Date('2021-03-23');
-    let logs = await listByDate(date);
-    let checkOut = logs[logs.length - 1];
-
-    expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBe(0);
-
-    date = new Date('2021-03-24');
-    logs = await listByDate(date);
-    checkOut = logs[logs.length - 1];
-
-    expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBe(0);
-
-    date = new Date('2021-03-25');
-    logs = await listByDate(date);
-    checkOut = logs[logs.length - 1];
-
-    expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBe(0);
-
-    date = new Date('2021-03-26');
-    logs = await listByDate(date);
-    checkOut = logs[logs.length - 1];
-
-    expect(checkOut.tags).toContain('CHECK-OUT');
-    expect(checkOut.duration).toBe(0);
   });
 });
 

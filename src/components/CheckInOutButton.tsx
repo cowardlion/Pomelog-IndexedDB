@@ -13,8 +13,6 @@ type Props = {
 };
 
 export const CheckInOutButton = ({ dateStr, isCheckedIn }: Props) => {
-  console.log('체크인..', dateStr);
-
   const [checkInMutation] = useMutation(CHECK_IN);
 
   const handleCheckIn = () => {

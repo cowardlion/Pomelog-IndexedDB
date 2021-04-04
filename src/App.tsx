@@ -9,6 +9,7 @@ import { CheckInOutButton } from './components/CheckInOutButton';
 import { TagAutomationButton } from './components/TagAutomationButton';
 import { TimeLogForm } from './components/TimeLogForm';
 import { DateNavigator } from './components/DateNavigator';
+import { getStartAtFromTimeLogs } from './utils';
 
 function App() {
   const [currentDateStr, setCurrentDateStr] = useState(() => {
@@ -24,14 +25,17 @@ function App() {
     return null;
   }
 
-  const { isCheckedIn, timeLogs } = data;
+  const { timeLogs } = data;
   const isPast = new Date(currentDateStr) < new Date();
+  const isCheckedIn = false;
+
+  const startAt = getStartAtFromTimeLogs(timeLogs, currentDateStr);
 
   return (
     <div className="App">
       <DateNavigator dateStr={currentDateStr} onChangeDate={(dateStr) => setCurrentDateStr(dateStr)} />
       <TimeLogList dateStr={currentDateStr} isPast={isPast} isCheckedIn={isCheckedIn} items={timeLogs} />
-      {isCheckedIn && <TimeLogForm startAt={timeLogs[timeLogs.length - 1].date} />}
+      <TimeLogForm key={currentDateStr} dateStr={currentDateStr} disableAutoSelect={isPast} startAt={startAt} />
       <TagAutomationButton />
       {!isPast && <CheckInOutButton dateStr={currentDateStr} isCheckedIn={isCheckedIn} />}
     </div>

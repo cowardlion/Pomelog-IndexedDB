@@ -8,13 +8,14 @@ export const CURRENT_DATE_STR = gql`
 
 export const TIME_LOGS = gql`
   query GetTimeLogs($dateStr: String!) {
-    isCheckedIn(dateStr: $dateStr) @client
     timeLogs(dateStr: $dateStr) @client {
       id
-      date
+      startAt
+      endAt
       note
       duration
       tags
+      isValid
     }
   }
 `;

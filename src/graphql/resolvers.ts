@@ -11,8 +11,6 @@ const resolvers = {
   },
   Mutation: {
     checkIn: async (_: any, { dateStr }: any) => {
-      console.log('--->', dateStr);
-
       return await checkIn();
     },
     addLog: async (_: any, { input }: any) => {
