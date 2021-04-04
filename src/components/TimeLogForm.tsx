@@ -2,7 +2,7 @@ import { FormEvent, useRef, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import styled from '@emotion/styled';
 import { Button, Input, TimePicker, Switch, Tooltip } from 'antd';
-import { SwapRightOutlined } from '@ant-design/icons';
+import { SwapRightOutlined, FormOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { getEndAtFromtStartAt } from '../utils';
@@ -162,7 +162,7 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
             )}
           </div>
           <div className="right">
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" icon={<FormOutlined />} htmlType="submit">
               기록하기
             </Button>
           </div>
