@@ -6,7 +6,7 @@ import { SwapRightOutlined, FormOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { getEndAtFromtStartAt } from '../utils';
-import { CheckInButton } from './CheckInButton';
+import { CheckPointButton } from './CheckPointButton';
 moment.locale('ko');
 
 const TIME_FORMAT = 'A h:mm';
@@ -128,7 +128,10 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
             <span>까지</span>
           </div>
           <div className="picker-switch">
-            <Tooltip title={isAutoTimePick ? '시간을 자동으로 선택합니다' : '시간을 수동 입력합니다'}>
+            <Tooltip
+              placement="topRight"
+              title={isAutoTimePick ? '종료 시간을 현재 시간으로 입력합니다' : '종료 시간을 수동 입력합니다'}
+            >
               <Switch
                 disabled={disableAutoSelect}
                 checked={isAutoTimePick}
@@ -152,9 +155,8 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
         <div className="footer">
           <div>
             {!disableAutoSelect && (
-              <CheckInButton
+              <CheckPointButton
                 dateStr={dateStr}
-                isCheckedIn={false}
                 onClick={() => {
                   setStartDateAt(new Date());
                 }}

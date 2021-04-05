@@ -65,18 +65,6 @@ db.version(1).stores({
 });
 
 const TIME_ZONE = 'YYYY-MM-DDT00:00:00Z';
-export const isCheckedInByDate = async (date = new Date()) => {
-  const mt = moment(date);
-  const today = mt.format(TIME_ZONE);
-  const tomorrow = mt.add(1, 'd').format(TIME_ZONE);
-
-  try {
-    const log = await db.table('timeLogs').where('endAt').between(new Date(today), new Date(tomorrow)).first();
-    return !!(log && log.tags?.includes('CHECK-IN'));
-  } catch (ex) {
-    return false;
-  }
-};
 
 export const listByDate = async (date = new Date()) => {
   const from = moment(date).format(TIME_ZONE);
@@ -140,22 +128,16 @@ export const remove = async (ids: number[]): Promise<void> => {
   return db.table('timeLogs').bulkDelete(ids);
 };
 
-export const checkIn = async (date = new Date()) => {
-  const isAlready = await isCheckedInByDate(date);
-
-  if (isAlready) {
-    throw new Error('같은 날짜에 체크인을 두번할 수 없다.');
-  }
-
+export const checkPoint = async (date = new Date()) => {
   if (moment().format('YYYY-MM-DD') !== moment(date).format('YYYY-MM-DD')) {
-    throw new Error('간편 체크인 기능은 오늘만 가능하다.');
+    throw new Error('체크포인트 기능은 당일만 가능하다.');
   }
 
   const logValue = {
     startAt: date,
     endAt: date,
-    note: 'Check-In',
-    tags: ['CHECK-IN'],
+    note: 'Check Point!',
+    tags: [],
     duration: 0,
   };
 

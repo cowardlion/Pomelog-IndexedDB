@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import moment from 'moment';
-import { db, checkIn, add, find, listByDate, update, remove, setupSampleDB } from './timeLogs';
+import { db, checkPoint, add, find, listByDate, update, remove, setupSampleDB } from './timeLogs';
 
 const delay = (second: number) =>
   new Promise((resolve) => {
@@ -9,7 +9,7 @@ const delay = (second: number) =>
     }, second * 1000);
   });
 
-describe('체크인', () => {
+describe('체크포인트: 현재 시간을 기점으로 어떤 일을 시작할때 마킹하는 용도로 사용한다', () => {
   beforeEach(async () => {
     await setupSampleDB();
   });
@@ -18,42 +18,31 @@ describe('체크인', () => {
     await db.table('timeLogs').clear();
   });
 
-  test('체크인(출근)인 현재 시간으로 시작과 종료를 기록하고 기간(duration)은 0으로 설정된다.', async () => {
+  test('시작과 종료에 현재 시간을 기록한다.', async () => {
     const date = new Date();
-    await checkIn(date);
+    await checkPoint(date);
     const log = await db.table('timeLogs').get({ endAt: date });
     expect(log.startAt).toEqual(date);
     expect(log.endAt).toEqual(date);
     expect(log.duration).toBe(0);
   });
 
-  test('체크인 기능은 당일만 가능하다.', async () => {
+  test('체크포인트 기능은 당일만 가능하다.', async () => {
     expect.assertions(2);
 
     try {
-      await checkIn(new Date('2021-03-28T16:24:00+0900'));
+      await checkPoint(new Date('2021-03-28T16:24:00+0900'));
     } catch (ex) {
-      expect(ex).toEqual(Error('간편 체크인 기능은 오늘만 가능하다.'));
+      expect(ex).toEqual(Error('체크포인트 기능은 당일만 가능하다.'));
     }
 
     try {
-      await checkIn(new Date('2022-03-28T16:24:00+0900'));
+      await checkPoint(new Date('2022-03-28T16:24:00+0900'));
     } catch (ex) {
-      expect(ex).toEqual(Error('간편 체크인 기능은 오늘만 가능하다.'));
+      expect(ex).toEqual(Error('체크포인트 기능은 당일만 가능하다.'));
     }
 
-    await checkIn(new Date());
-  });
-
-  test('같은 날짜에 체크인을 두번할 수 없다.', async () => {
-    expect.assertions(1);
-    await checkIn();
-
-    try {
-      await checkIn();
-    } catch (ex) {
-      expect(ex).toEqual(Error('같은 날짜에 체크인을 두번할 수 없다.'));
-    }
+    await checkPoint(new Date());
   });
 });
 
@@ -97,7 +86,7 @@ describe('조회', () => {
 
 describe('기록', () => {
   beforeAll(async () => {
-    await checkIn();
+    await checkPoint();
   });
 
   afterAll(async () => {
@@ -176,8 +165,8 @@ describe('데이터 검증', () => {
   test('지정된 날짜의 체크인은 유일해야한다.', async () => {
     const date = new Date('2021-03-24');
     const logs = await listByDate(date);
-    const checkIns = logs.filter(({ tags }) => tags?.includes('CHECK-IN'));
-    expect(checkIns.length).toBe(1);
+    const checkPoints = logs.filter(({ tags }) => tags?.includes('CHECK-IN'));
+    expect(checkPoints.length).toBe(1);
   });
 
   test('체크인과 체크아웃을 제외한 모든 기록은 duration을 가져야한다.', async () => {
