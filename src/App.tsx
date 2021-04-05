@@ -1,16 +1,14 @@
 import './App.less';
-import styled from '@emotion/styled';
-import { Button } from 'antd';
-import { BarsOutlined, PicCenterOutlined } from '@ant-design/icons';
+
 import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import cache, { LocalCache } from './graphql/cache';
 import { CURRENT_DATE_STR, TIME_LOGS } from './graphql/queries';
 
 import { TimeLogList } from './components/TimeLogList';
-import { TagAutomationButton } from './components/TagAutomationButton';
 import { TimeLogForm } from './components/TimeLogForm';
 import { DateNavigator } from './components/DateNavigator';
+import { Configuration } from './components/Configuration';
 import { getStartAtFromTimeLogs } from './utils';
 import moment from 'moment';
 
@@ -40,15 +38,7 @@ function App() {
         dateStr={currentDateStr}
         onChangeDate={(dateStr) => setCurrentDateStr(dateStr)}
       />
-      <ConfigStyled>
-        <div className="display-style">
-          <Button type="primary" icon={<BarsOutlined />} />
-          <Button icon={<PicCenterOutlined />} />
-        </div>
-        <div>
-          <TagAutomationButton />
-        </div>
-      </ConfigStyled>
+      <Configuration />
       <TimeLogList dateStr={currentDateStr} items={timeLogs} />
       <TimeLogForm
         key={`${currentDateStr}-${timeLogs.length}`}
@@ -59,17 +49,5 @@ function App() {
     </div>
   );
 }
-
-const ConfigStyled = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-
-  .display-style {
-    button {
-      width: 50px;
-    }
-  }
-`;
 
 export default App;
