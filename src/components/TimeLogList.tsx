@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Empty } from 'antd';
+import classnames from 'classnames';
 import type { TimeLog } from '../api/timeLogs';
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -14,9 +15,12 @@ type Props = {
 export const TimeLogList = ({ items, dateStr }: Props) => {
   const isEmpty = items.length === 0;
   const noBottomBorder = 3 < items.length;
+  const containerClass = classnames('TimeLogList', {
+    'empty-list': isEmpty,
+  });
 
   return (
-    <ListStyled className="TimeLogList">
+    <ListStyled className={containerClass}>
       {isEmpty ? (
         <div>
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="남겨진 기록이 없습니다." />
@@ -39,6 +43,12 @@ const ListStyled = styled.div`
   border-radius: 3px;
   margin-bottom: 10px;
   padding: 0;
+
+  &.empty-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   ul {
     list-style: none;
