@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { gql, useMutation } from '@apollo/client';
 import { Button } from 'antd';
-import { SwapRightOutlined, FormOutlined } from '@ant-design/icons';
+import { SwapRightOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLogs';
