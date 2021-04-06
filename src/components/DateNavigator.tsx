@@ -4,7 +4,7 @@ import { CURRENT_DATE_STR, TIME_LOGS } from '../graphql/queries';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { Button } from 'antd';
-import { listByDate } from '../api/timeLogs';
+import { listByDate, TimeLog } from '../api/timeLogs';
 moment.locale('ko');
 
 type Props = {
@@ -15,11 +15,22 @@ type Props = {
 export const DateNavigator = ({ dateStr: currentDateStr, onChangeDate }: Props) => {
   const disableNextDay = moment().format('YYYY-MM-DD') === currentDateStr;
   const currentDate = moment(new Date(currentDateStr));
-  const dateStr = currentDate.format('LL');
+  const dateStr = currentDate.format('MMM Do (dd)');
+
+  const handleMoveToday = async () => {
+    const date = new Date();
+
+    updateCache(date);
+  };
 
   const handleChangeDate = async (amount: -1 | 1) => {
     currentDate.add(amount, 'day');
     const date = currentDate.toDate();
+
+    updateCache(date);
+  };
+
+  const updateCache = async (date: Date) => {
     const timeLogs = await listByDate(date);
     const currentDateStr = moment(date).format('YYYY-MM-DD');
 
@@ -45,14 +56,12 @@ export const DateNavigator = ({ dateStr: currentDateStr, onChangeDate }: Props) 
 
   return (
     <NavigatorStyled>
-      <div className="btn-group">
-        <Button onClick={() => handleChangeDate(-1)}>이전</Button>
-      </div>
       <div>
         <h1>{dateStr}</h1>
-        <sub>{currentDate.format('dddd')}</sub>
       </div>
       <div className="btn-group">
+        <Button onClick={() => handleChangeDate(-1)}>이전</Button>
+        <Button onClick={handleMoveToday}>오늘</Button>
         <Button disabled={disableNextDay} onClick={() => handleChangeDate(1)}>
           다음
         </Button>
@@ -63,19 +72,22 @@ export const DateNavigator = ({ dateStr: currentDateStr, onChangeDate }: Props) 
 
 const NavigatorStyled = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  padding: 20px 0;
+  padding: 10px 0 20px 0;
 
   h1 {
     font-size: 1.4em;
   }
 
   .btn-group {
-    padding: 0 20px;
     button {
       padding: 4px 8px;
+      margin-right: 5px;
+
+      &:last-child {
+        margin-right: 0;
+      }
     }
   }
 `;
