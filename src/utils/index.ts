@@ -15,14 +15,18 @@ export const msToTime = (s: number) => {
 
   let timeStr = '';
   if (hrs) {
-    timeStr += hrs + '시간 ';
+    timeStr += hrs + 'h ';
   }
 
   if (mins) {
-    timeStr += mins + '분 ';
+    timeStr += mins + 'm';
   }
 
-  return timeStr;
+  if (mins === 0 && secs) {
+    timeStr += 1 + 'm';
+  }
+
+  return `(${timeStr})`;
 };
 
 /**

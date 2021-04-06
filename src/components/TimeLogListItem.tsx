@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { gql, useMutation } from '@apollo/client';
 import { Button } from 'antd';
+import { SwapRightOutlined, FormOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLogs';
@@ -25,7 +26,7 @@ type RootQuery = {
   timeLogs: TimeLog[];
 };
 
-export const TimeLogListItem = ({ dateStr, item: { id, note, endAt, duration, isValid } }: Props) => {
+export const TimeLogListItem = ({ dateStr, item: { id, note, startAt, endAt, duration, isValid } }: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
 
   const handleDeleteLog = () => {
@@ -51,15 +52,16 @@ export const TimeLogListItem = ({ dateStr, item: { id, note, endAt, duration, is
   return (
     <ListItemStyled className={isValid ? '' : 'invalid'}>
       <div className="content">
-        <div className="date">
-          <strong>{moment(endAt).format('A h:mm')}</strong>
+        <div className="date-range">
+          <span>{moment(startAt).format('A h:mm')}</span>
+          <SwapRightOutlined className="time-dash" />
+          <span>{moment(endAt).format('A h:mm')}</span>
+          {isValid ? <span className="duration">{msToTime(duration)}</span> : <span>시간이 겹칩니다.</span>}
         </div>
-        <div className="note">
-          <div>{note}</div>
-        </div>
+        <div className="note">{note}</div>
+        <div className="tag"></div>
       </div>
       <div className="meta">
-        {isValid ? <span className="duration">{msToTime(duration)}</span> : <span>시간이 겹칩니다.</span>}
         <Button onClick={handleDeleteLog}>삭제</Button>
       </div>
     </ListItemStyled>
@@ -70,8 +72,7 @@ const ListItemStyled = styled.li`
   border-bottom: 1px dashed #aeaeae;
   display: flex;
   justify-content: space-between;
-  height: 50px;
-  padding: 0 10px;
+  padding: 10px;
   cursor: pointer;
 
   &.invalid {
@@ -93,12 +94,14 @@ const ListItemStyled = styled.li`
   }
 
   .content {
-    display: flex;
-    align-items: center;
-    flex: 1;
+    .date-range {
+      font-size: 0.875em;
+      color: #333;
+      line-height: 130%;
 
-    .date {
-      width: 90px;
+      .duration {
+        margin-left: 5px;
+      }
     }
 
     .note {
@@ -108,14 +111,9 @@ const ListItemStyled = styled.li`
 
   .meta {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    width: 110px;
-    text-align: right;
-
-    .duration {
-      font-size: 0.8em;
-    }
+    width: 50px;
 
     button {
       padding: 4px 8px;
