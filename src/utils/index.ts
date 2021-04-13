@@ -35,9 +35,12 @@ export const msToTime = (s: number) => {
  * @param dateStr 기준 날짜
  * @returns
  */
-export const getStartAtFromTimeLogs = (timeLogs: TimeLog[], dateStr: string): Date => {
+export const getStartAtFromTimeLogs = (timeLogs: TimeLog[], dateStr: string, isSameDateStr: boolean): Date => {
   if (timeLogs.length === 0) {
-    return new Date(dateStr);
+    if (isSameDateStr) {
+      return new Date(`${dateStr}T00:00:00`); // 오전 00시
+    }
+    return new Date(`${dateStr}T00:00:00z`); // 오전 9시
   }
 
   return timeLogs[timeLogs.length - 1].endAt;
