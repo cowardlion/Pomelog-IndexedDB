@@ -1,12 +1,16 @@
 import Dexie from 'dexie';
 import moment from 'moment-timezone';
 
+export type Category = {
+  name: string;
+};
+
 export type TimeLog = {
   id: number;
   startAt: Date;
   endAt: Date;
   note: string;
-  tags: string[];
+  category: Category;
   duration: number;
   isValid: boolean;
 };
@@ -72,31 +76,26 @@ export const listByDate = async (date = new Date()) => {
   const logs = await db.table('timeLogs').where('endAt').between(new Date(from), new Date(to)).sortBy('endAt');
 
   const timeLogs = logs.map((log: TimeLog, index: number, arr: TimeLog[]) => {
-    const { tags = [], ...rest } = log;
+    const { ...rest } = log;
     let isValid = true;
 
     if (0 < index && arr[index - 1].endAt > log.startAt) {
       isValid = false;
     }
 
-    return { ...rest, tags, duration: log.endAt.valueOf() - log.startAt.valueOf(), isValid };
+    return { ...rest, duration: log.endAt.valueOf() - log.startAt.valueOf(), isValid };
   });
 
   return timeLogs;
 };
 
 export const find = async (match: MatchLog): Promise<TimeLog> => {
-  const { id, endAt, note, tag } = match;
+  const { id, endAt, note } = match;
   const logs = (await listByDate(endAt)) as TimeLog[];
 
   for (let i = 0; i < logs.length; ++i) {
     const log = logs[i];
-    if (
-      log.id === id ||
-      log.endAt.valueOf() === endAt?.valueOf() ||
-      (note && 0 < log.note?.indexOf(note)) ||
-      (tag && log.tags?.includes(tag))
-    ) {
+    if (log.id === id || log.endAt.valueOf() === endAt?.valueOf() || (note && 0 < log.note?.indexOf(note))) {
       return log;
     }
   }

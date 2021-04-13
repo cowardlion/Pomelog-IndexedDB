@@ -77,7 +77,10 @@ const NavigatorStyled = styled.div`
   padding: 10px 0 20px 0;
 
   h1 {
-    font-size: 1.4em;
+    font-size: 1.25em;
+    font-weight: bold;
+    line-height: 24px;
+    letter-spacing: -0.3px;
   }
 
   .btn-group {

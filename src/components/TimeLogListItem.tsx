@@ -26,7 +26,10 @@ type RootQuery = {
   timeLogs: TimeLog[];
 };
 
-export const TimeLogListItem = ({ dateStr, item: { id, note, startAt, endAt, duration, isValid } }: Props) => {
+export const TimeLogListItem = ({
+  dateStr,
+  item: { id, note, startAt, endAt, duration, category, isValid },
+}: Props) => {
   const [removeLogMutation] = useMutation(REMOVE_LOG);
 
   const handleDeleteLog = () => {
@@ -59,8 +62,9 @@ export const TimeLogListItem = ({ dateStr, item: { id, note, startAt, endAt, dur
           {isValid ? <span className="duration">{msToTime(duration)}</span> : <span>시간이 겹칩니다.</span>}
         </div>
         <div className="note">{note}</div>
-        <div className="tag"></div>
+        {!category && <small>카테고리 없음</small>}
       </div>
+
       <div className="meta">
         <Button onClick={handleDeleteLog}>삭제</Button>
       </div>

@@ -31,7 +31,6 @@ type Props = {
 export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Props) => {
   const [addLogMutation] = useMutation(ADD_TIME_LOG);
   const noteRef = useRef<Input | null>(null);
-  const tagRef = useRef<Input | null>(null);
   const [startDateAt, setStartDateAt] = useState<Date>(startAt);
   const [endDateAt, setEndDateAt] = useState<Date>(() => getEndAtFromtStartAt(startDateAt, dateStr, disableAutoSelect));
   const [isAutoTimePick, setAutoTimePick] = useState(() => {
@@ -45,7 +44,7 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
     event.preventDefault();
 
     const elements = ((event.target as HTMLFormElement).elements as unknown) as FormElements;
-    const { note, tag } = elements;
+    const { note } = elements;
 
     if (!note.value) {
       alert('필수 입력값이 없습니다.');
@@ -56,7 +55,6 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
       startAt: startDateAt,
       endAt: isAutoTimePick ? new Date() : endDateAt,
       note: note.value,
-      tag: tag.value,
     };
 
     addLogMutation({
@@ -78,7 +76,6 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
         });
 
         noteRef.current?.setValue('');
-        tagRef.current?.setValue('');
         setStartDateAt(newLog.endAt);
         setEndDateAt(getEndAtFromtStartAt(newLog.endAt, dateStr, disableAutoSelect));
       },
@@ -150,7 +147,7 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
             bordered={false}
             autoFocus={true}
           />
-          <Input ref={tagRef} name="tag" placeholder="태그를 입력하세요." bordered={false} />
+          <div className="category">노트를 작성하면 카테고리 설정에 따라 자동 분류됩니다.</div>
         </div>
         <div className="footer">
           <div>
@@ -223,12 +220,14 @@ const FormStyled = styled.div`
       border-bottom: 1px solid #dedede;
 
       input[name='note'] {
-        border-bottom: 1px dashed #dedede;
+        /* border-bottom: 1px dashed #dedede; */
         padding: 10px;
       }
 
-      input[name='tag'] {
+      .category {
         padding: 10px;
+        font-size: 0.8em;
+        color: #ccc;
       }
     }
 
