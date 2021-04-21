@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Empty } from 'antd';
+import { useState } from 'react';
 import classnames from 'classnames';
 import type { TimeLog } from '../api/timeLogs';
 import moment from 'moment';
@@ -19,6 +20,12 @@ export const TimeLogList = ({ items, dateStr }: Props) => {
     'empty-list': isEmpty,
   });
 
+  const [curEditItem, setEditItem] = useState<number | null>(null);
+
+  const handleEditItem = (id: number | null) => {
+    setEditItem(id);
+  };
+
   return (
     <ListStyled className={containerClass}>
       {isEmpty ? (
@@ -28,7 +35,13 @@ export const TimeLogList = ({ items, dateStr }: Props) => {
       ) : (
         <ul className={noBottomBorder ? 'bottom-border-line' : ''}>
           {items.map((item: TimeLog) => (
-            <TimeLogListItem key={item.id} dateStr={dateStr} item={item} />
+            <TimeLogListItem
+              key={item.id}
+              dateStr={dateStr}
+              item={item}
+              onEdit={handleEditItem}
+              isEditing={curEditItem === item.id}
+            />
           ))}
         </ul>
       )}
@@ -37,8 +50,8 @@ export const TimeLogList = ({ items, dateStr }: Props) => {
 };
 
 const ListStyled = styled.div`
-  background-color: cornsilk;
-  border: 1px solid #383838;
+  /* background-color: cornsilk; */
+  /* border: 1px solid #383838; */
   min-height: 200px;
   border-radius: 3px;
   margin-bottom: 10px;
@@ -53,9 +66,9 @@ const ListStyled = styled.div`
   ul {
     list-style: none;
 
-    &.bottom-border-line li:last-child {
+    /* &.bottom-border-line li:last-child {
       border: none;
-    }
+    } */
   }
 
   .message {

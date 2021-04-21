@@ -1,21 +1,15 @@
 import { FormEvent, useRef, useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
 import styled from '@emotion/styled';
 import { Button, Input, TimePicker, Switch, Tooltip } from 'antd';
 import { SwapRightOutlined, FormOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { getEndAtFromtStartAt } from '../utils';
-import { CheckPointButton } from './CheckPointButton';
+import { MarkCurrentTimeButton } from './MarkCurrentTimeButton';
+import { useMutationCreateLog } from '../graphql/queries';
 moment.locale('ko');
 
 const TIME_FORMAT = 'A h:mm';
-
-const ADD_TIME_LOG = gql`
-  mutation AddLog($input: InputLog!) {
-    addLog(input: $input) @client
-  }
-`;
 
 type FormElements = {
   note: HTMLInputElement;
@@ -29,7 +23,7 @@ type Props = {
 };
 
 export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Props) => {
-  const [addLogMutation] = useMutation(ADD_TIME_LOG);
+  const [addLogMutation] = useMutationCreateLog();
   const noteRef = useRef<Input | null>(null);
   const [startDateAt, setStartDateAt] = useState<Date>(startAt);
   const [endDateAt, setEndDateAt] = useState<Date>(() => getEndAtFromtStartAt(startDateAt, dateStr, disableAutoSelect));
@@ -152,7 +146,7 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
         <div className="footer">
           <div>
             {!disableAutoSelect && (
-              <CheckPointButton
+              <MarkCurrentTimeButton
                 dateStr={dateStr}
                 onClick={() => {
                   setStartDateAt(new Date());

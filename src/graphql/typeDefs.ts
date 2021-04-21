@@ -13,16 +13,24 @@ type Scalars = {
 
 type TimeLog {
   id: ID!
-  date: Date!
+  startAt: Date!
+  endAt: Date!
   note: String!
-  tags: String[]
+  category: String
   duration: Int
+  isValid: Boolean
 }
 
 type InputLog {
-  date: Date
+  startAt: Date
+  endAt: Date
   note: String!
-  tag: String
+} 
+
+type UpdateLog {
+  startAt: Date!
+  endAt: Date!
+  note: String!
 } 
 
 type Query {
@@ -35,6 +43,7 @@ type Mutation {
   checkPoint(dateStr: String!): TimeLog!
   addLog(input: InputLog!): ID
   removeLog(id: ID!): ID
+  updateLog(id: ID!, changes: UpdateLog): ID
 }
 `;
 

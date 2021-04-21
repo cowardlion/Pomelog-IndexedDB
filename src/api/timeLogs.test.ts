@@ -108,35 +108,11 @@ describe('기록', () => {
     const endAt = new Date();
     const startAt = mtNow.add(-1, 'hour').toDate();
 
-    await add({ startAt, endAt, note: '테스트', tag: '' });
+    await add({ startAt, endAt, note: '테스트' });
 
     const log = await find({ endAt });
     expect(log.note).toEqual('테스트');
     expect(log.duration).toBe(3600000);
-  });
-
-  test('태그(tag)가 없으면 배열로 저장된다', async () => {
-    const mtNow = moment();
-    const endAt = new Date();
-    const startAt = mtNow.add(-1, 'hour').toDate();
-
-    await add({ startAt, endAt, note: '태그 테스트' });
-
-    const log = await find({ endAt });
-    expect(log.tags).toEqual([]);
-    expect(log.note).toEqual('태그 테스트');
-  });
-
-  test('문자열 태그(tag)가 입력되면 콤마(,)로 분리해서 배열로 저장한다.', async () => {
-    const mtNow = moment();
-    const endAt = new Date();
-    const startAt = mtNow.add(-1, 'hour').toDate();
-
-    await add({ startAt, endAt, note: '태그 테스트2', tag: '작업 ' });
-
-    const log = await find({ endAt });
-    expect(log.note).toEqual('태그 테스트2');
-    expect(log.tags).toEqual(['작업']);
   });
 });
 
@@ -148,7 +124,7 @@ describe('데이터 검증', () => {
   afterAll(async () => {
     await db.table('timeLogs').clear();
   });
-  test('모든 기록은 id, startAt, endAt, note, tags, duration, isValid 필드 값이 항상 존재해야한다.', async () => {
+  test('모든 기록은 id, startAt, endAt, note, category, duration, isValid 필드 값이 항상 존재해야한다.', async () => {
     const date = new Date('2021-03-23');
     const logs = await listByDate(date);
 
@@ -157,26 +133,19 @@ describe('데이터 검증', () => {
       expect(log.startAt).not.toBeUndefined();
       expect(log.endAt).not.toBeUndefined();
       expect(log.note).not.toBeUndefined();
-      expect(log.tags).not.toBeUndefined();
+      // expect(log.category).not.toBeUndefined();
       expect(log.isValid).not.toBeUndefined();
     });
   });
 
-  test('지정된 날짜의 체크인은 유일해야한다.', async () => {
-    const date = new Date('2021-03-24');
-    const logs = await listByDate(date);
-    const checkPoints = logs.filter(({ tags }) => tags?.includes('CHECK-IN'));
-    expect(checkPoints.length).toBe(1);
-  });
-
-  test('체크인과 체크아웃을 제외한 모든 기록은 duration을 가져야한다.', async () => {
+  test('모든 기록은 duration을 가져야한다.', async () => {
     const date = new Date('2021-03-24');
     const logs = await listByDate(date);
 
-    for (let i = 1; i < logs.length - 1; ++i) {
+    for (let i = 0; i < logs.length; ++i) {
       const log = logs[i];
 
-      expect(log.duration).not.toBe(0);
+      expect(log.duration).not.toBeUndefined();
     }
   });
 });

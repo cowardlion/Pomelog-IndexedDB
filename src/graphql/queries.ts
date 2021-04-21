@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 
 export const CURRENT_DATE_STR = gql`
   query {
@@ -14,8 +14,29 @@ export const TIME_LOGS = gql`
       endAt
       note
       duration
-      tags
       isValid
     }
   }
 `;
+
+const CREATE_LOG = gql`
+  mutation AddLog($input: InputLog!) {
+    addLog(input: $input) @client
+  }
+`;
+
+const REMOVE_LOG = gql`
+  mutation RemoveLog($id: ID!) {
+    removeLog(id: $id) @client
+  }
+`;
+
+const UPDATE_LOG = gql`
+  mutation UpdateLog($changes: UpdateLog!) {
+    updateLog(changes: $changes) @client
+  }
+`;
+
+export const useMutationRemoveLog = () => useMutation(REMOVE_LOG);
+export const useMutationUpdateLog = () => useMutation(UPDATE_LOG);
+export const useMutationCreateLog = () => useMutation(CREATE_LOG);
