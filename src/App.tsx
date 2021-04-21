@@ -29,7 +29,7 @@ function App() {
   const { timeLogs } = data;
   const isSameDateStr = moment(currentDateStr).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD');
 
-  const startAt = getStartAtFromTimeLogs(timeLogs, currentDateStr);
+  const startAt = getStartAtFromTimeLogs(timeLogs, currentDateStr, isSameDateStr);
 
   return (
     <div className="App">
