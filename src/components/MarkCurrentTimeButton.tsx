@@ -13,7 +13,7 @@ type Props = {
   onClick?: () => void;
 };
 
-export const CheckPointButton = ({ dateStr, onClick }: Props) => {
+export const MarkCurrentTimeButton = ({ dateStr, onClick }: Props) => {
   const [checkPointMutation] = useMutation(CHECK_IN);
 
   const handlecheckPoint = () => {
@@ -39,9 +39,9 @@ export const CheckPointButton = ({ dateStr, onClick }: Props) => {
   };
 
   return (
-    <Tooltip placement="topLeft" title="현재 시간을 어떤 일의 시작 시간으로 쓰기 위해 마킹하는 용도로 사용합니다.">
+    <Tooltip placement="topLeft" title="현재 시간을 미리 등록 해두고 하던 일이 마무리 되면 수정하세요!">
       <Button icon={<CheckCircleOutlined />} onClick={handlecheckPoint}>
-        체크포인트
+        현재시간 마킹
       </Button>
     </Tooltip>
   );

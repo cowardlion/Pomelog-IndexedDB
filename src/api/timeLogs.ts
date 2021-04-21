@@ -135,7 +135,7 @@ export const checkPoint = async (date = new Date()) => {
   const logValue = {
     startAt: date,
     endAt: date,
-    note: 'Check Point!',
+    note: '지금부터 무언가를 시작합니다. 일이 마무리되면 수정하세요.',
     tags: [],
     duration: 0,
   };

@@ -6,7 +6,7 @@ import { SwapRightOutlined, FormOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { getEndAtFromtStartAt } from '../utils';
-import { CheckPointButton } from './CheckPointButton';
+import { MarkCurrentTimeButton } from './MarkCurrentTimeButton';
 moment.locale('ko');
 
 const TIME_FORMAT = 'A h:mm';
@@ -152,7 +152,7 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
         <div className="footer">
           <div>
             {!disableAutoSelect && (
-              <CheckPointButton
+              <MarkCurrentTimeButton
                 dateStr={dateStr}
                 onClick={() => {
                   setStartDateAt(new Date());
