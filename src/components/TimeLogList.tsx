@@ -23,7 +23,6 @@ export const TimeLogList = ({ items, dateStr }: Props) => {
   const [curEditItem, setEditItem] = useState<number | null>(null);
 
   const handleEditItem = (id: number | null) => {
-    console.log('LI,', id);
     setEditItem(id);
   };
 

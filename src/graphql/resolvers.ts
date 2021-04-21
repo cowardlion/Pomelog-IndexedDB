@@ -1,4 +1,4 @@
-import { listByDate, checkPoint, remove, add } from '../api/timeLogs';
+import { listByDate, checkPoint, remove, add, update } from '../api/timeLogs';
 
 const resolvers = {
   Query: {
@@ -15,6 +15,9 @@ const resolvers = {
     },
     removeLog: async (_: any, { id }: any) => {
       return await remove([id]);
+    },
+    updateLog: async (_: any, { changes: { id, ...values } }: any) => {
+      return await update(id, values);
     },
   },
 };

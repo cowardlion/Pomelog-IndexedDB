@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { gql, useMutation } from '@apollo/client';
 import { useRef, useState, MouseEvent } from 'react';
 import { Button, Input, TimePicker } from 'antd';
 import { SwapRightOutlined, EditOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
@@ -8,15 +7,9 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLogs';
 import { msToTime } from '../utils';
-import { TIME_LOGS } from '../graphql/queries';
+import { TIME_LOGS, useMutationRemoveLog, useMutationUpdateLog } from '../graphql/queries';
 moment.locale('ko');
 const TIME_FORMAT = 'A h:mm';
-
-const REMOVE_LOG = gql`
-  mutation RemoveLog($id: ID!) {
-    removeLog(id: $id) @client
-  }
-`;
 
 type RootQuery = {
   isCheckedIn: boolean;
@@ -41,10 +34,42 @@ export const TimeLogListItem = ({
 
   const noteRef = useRef<Input | null>(null);
 
-  const [removeLogMutation] = useMutation(REMOVE_LOG);
+  const [removeLogMutation] = useMutationRemoveLog();
+  const [updateLogMutation] = useMutationUpdateLog();
 
   const handleSave = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+
+    const changes = {
+      id,
+      note: noteRef.current?.state.value,
+      startAt: startDateAt,
+      endAt: endDateAt,
+    };
+
+    updateLogMutation({
+      variables: {
+        changes,
+      },
+      optimisticResponse: true,
+      update(cache, { data: { updateLog } }) {
+        const data = cache.readQuery({ query: TIME_LOGS, variables: { dateStr } });
+        const { timeLogs } = data as RootQuery;
+
+        const newLogs = timeLogs.map((log) => {
+          return log.id === id ? updateLog : log;
+        });
+
+        cache.modify({
+          fields: {
+            timeLogs() {
+              return newLogs;
+            },
+          },
+        });
+      },
+    });
+
     onEdit(null);
   };
 
@@ -80,7 +105,7 @@ export const TimeLogListItem = ({
           <div className="date-range">
             <div>
               <TimePicker
-                value={moment(startAt)}
+                value={moment(startDateAt)}
                 bordered={false}
                 format={TIME_FORMAT}
                 placeholder="시작"
@@ -180,6 +205,10 @@ const ListItemStyled = styled.li`
     :hover {
       background-color: #fff;
       /* transition: background-color 1s; */
+    }
+
+    small {
+      padding-left: 10px;
     }
 
     .btns {

@@ -19,7 +19,6 @@ export type InputLog = {
   startAt: Date;
   endAt?: Date;
   note: String;
-  tag?: String;
 };
 
 export type MatchLog = Partial<{
@@ -27,7 +26,7 @@ export type MatchLog = Partial<{
   startAt: Date;
   endAt: Date;
   note: string;
-  tag: string;
+  category: string;
 }>;
 
 export type UpdateLog = Omit<MatchLog, 'id'>;
@@ -38,9 +37,8 @@ export const setupSampleDB = async () => {
       startAt: new Date('2021-03-23T03:24:00z'),
       endAt: new Date('2021-03-23T03:24:00z'),
       note: 'test1',
-      tags: ['CHECK-IN'],
     },
-    { startAt: new Date('2021-03-23T03:24:00z'), endAt: new Date('2021-03-23T04:24:00z'), note: 'test2', tags: [] },
+    { startAt: new Date('2021-03-23T03:24:00z'), endAt: new Date('2021-03-23T04:24:00z'), note: 'test2' },
     { startAt: new Date('2021-03-23T04:24:00z'), endAt: new Date('2021-03-23T05:24:00z'), note: 'test3' },
     { startAt: new Date('2021-03-23T05:24:00z'), endAt: new Date('2021-03-23T06:24:00z'), note: 'test4' },
     { startAt: new Date('2021-03-23T06:24:00z'), endAt: new Date('2021-03-23T07:24:00z'), note: 'test5' },
@@ -48,13 +46,11 @@ export const setupSampleDB = async () => {
       startAt: new Date('2021-03-23T08:24:00z'),
       endAt: new Date('2021-03-23T08:24:00z'),
       note: '테스트 체크아웃',
-      tags: ['CHECK-OUT'],
     },
     {
       startAt: new Date('2021-03-24T08:24:00z'),
       endAt: new Date('2021-03-24T08:24:00z'),
       note: 'test6',
-      tags: ['CHECK-IN'],
     },
     { startAt: new Date('2021-03-24T08:24:00z'), endAt: new Date('2021-03-24T09:24:00z'), note: 'test7' },
     { startAt: new Date('2021-03-24T09:24:00z'), endAt: new Date('2021-03-24T10:24:00z'), note: 'test8' },
@@ -104,7 +100,7 @@ export const find = async (match: MatchLog): Promise<TimeLog> => {
 };
 
 export const add = async (input: InputLog) => {
-  const { startAt, endAt = new Date(), note, tag = '' } = input;
+  const { startAt, endAt = new Date(), note } = input;
 
   if (!startAt || !note) {
     throw new Error('기록을 위한 필수 데이터가 없습니다.');
@@ -114,7 +110,6 @@ export const add = async (input: InputLog) => {
     startAt,
     endAt,
     note,
-    tags: tag ? tag.split(',').map((s) => s.trim()) : [],
   });
 };
 
@@ -136,7 +131,6 @@ export const checkPoint = async (date = new Date()) => {
     startAt: date,
     endAt: date,
     note: '지금부터 무언가를 시작합니다. 일이 마무리되면 수정하세요.',
-    tags: [],
     duration: 0,
   };
 
