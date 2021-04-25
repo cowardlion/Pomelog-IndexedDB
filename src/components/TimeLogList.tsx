@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Empty } from 'antd';
 import { useState } from 'react';
 import classnames from 'classnames';
-import type { TimeLog } from '../api/timeLogs';
+import type { TimeLog } from '../api/timeLog';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { TimeLogListItem } from './TimeLogListItem';

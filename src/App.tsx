@@ -3,12 +3,13 @@ import './App.less';
 import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import cache, { LocalCache } from './graphql/cache';
-import { CURRENT_DATE_STR, TIME_LOGS } from './graphql/queries';
+import { CURRENT_DATE_STR, TIME_LOGS, APP_STATES } from './graphql/queries';
 
 import { TimeLogList } from './components/TimeLogList';
 import { TimeLogForm } from './components/TimeLogForm';
 import { DateNavigator } from './components/DateNavigator';
 import { Configuration } from './components/Configuration';
+// import { Statics } from './components/Statics';
 import { getStartAtFromTimeLogs } from './utils';
 import moment from 'moment';
 
@@ -20,13 +21,14 @@ function App() {
     return currentDateStr;
   });
 
-  const { loading, data } = useQuery(TIME_LOGS, { variables: { dateStr: currentDateStr } });
+  const { loading, data, error } = useQuery(APP_STATES, { variables: { dateStr: currentDateStr } });
 
-  if (loading) {
+  console.log('---->', error, data);
+  if (loading || !!error) {
     return null;
   }
 
-  const { timeLogs } = data;
+  const { timeLogs, categories } = data;
   const isSameDateStr = moment(currentDateStr).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD');
 
   const startAt = getStartAtFromTimeLogs(timeLogs, currentDateStr, isSameDateStr);
@@ -38,7 +40,7 @@ function App() {
         dateStr={currentDateStr}
         onChangeDate={(dateStr) => setCurrentDateStr(dateStr)}
       />
-      <Configuration />
+      <Configuration items={categories} />
       <TimeLogList dateStr={currentDateStr} items={timeLogs} />
       <TimeLogForm
         key={`${currentDateStr}-${timeLogs.length}`}

@@ -21,6 +21,13 @@ type TimeLog {
   isValid: Boolean
 }
 
+type Category {
+  name: String!
+  emoji: String!
+  keywords: [String]!
+  order: Int
+}
+
 type InputLog {
   startAt: Date
   endAt: Date
@@ -33,11 +40,11 @@ type UpdateLog {
   note: String!
 } 
 
-type Query {
+type AppState {
   timeLogs(date: Date!): [TimeLog]!
-  isCheckedIn(date: Date!): Boolean!
-  currentDateStr: String!
+  categories: [Category]!
 }
+
 
 type Mutation {
   checkPoint(dateStr: String!): TimeLog!

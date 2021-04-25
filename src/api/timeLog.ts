@@ -1,9 +1,6 @@
-import Dexie from 'dexie';
 import moment from 'moment-timezone';
-
-export type Category = {
-  name: string;
-};
+import { db } from './database';
+import { Category } from './category';
 
 export type TimeLog = {
   id: number;
@@ -58,11 +55,6 @@ export const setupSampleDB = async () => {
     { startAt: new Date('2021-03-24T11:24:00z'), endAt: new Date('2021-03-24T12:24:00z'), note: 'test10' },
   ]);
 };
-
-export const db = new Dexie('Pomelog');
-db.version(1).stores({
-  timeLogs: '++id, &endAt',
-});
 
 const TIME_ZONE = 'YYYY-MM-DDT00:00:00Z';
 

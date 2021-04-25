@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider, ApolloClient } from '@apollo/client';
 import { ConfigProvider } from 'antd';
-import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 import cache from './graphql/cache';
 
@@ -15,7 +14,6 @@ import locale from 'antd/lib/locale/ko_KR';
 
 const client = new ApolloClient({
   cache,
-  typeDefs,
   resolvers,
 });
 

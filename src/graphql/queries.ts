@@ -6,8 +6,28 @@ export const CURRENT_DATE_STR = gql`
   }
 `;
 
+export const APP_STATES = gql`
+  query appState($dateStr: String!) {
+    timeLogs(dateStr: $dateStr) @client {
+      id
+      startAt
+      endAt
+      note
+      duration
+      isValid
+    }
+    categories @client {
+      id
+      name
+      emoji
+      keywords
+      order
+    }
+  }
+`;
+
 export const TIME_LOGS = gql`
-  query GetTimeLogs($dateStr: String!) {
+  query getTimeLogs($dateStr: String!) {
     timeLogs(dateStr: $dateStr) @client {
       id
       startAt

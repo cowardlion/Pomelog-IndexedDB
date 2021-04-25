@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 import moment from 'moment';
-import { db, checkPoint, add, find, listByDate, update, remove, setupSampleDB } from './timeLogs';
+import { db } from './database';
+import { checkPoint, add, find, listByDate, update, remove, setupSampleDB } from './timeLog';
 
 const delay = (second: number) =>
   new Promise((resolve) => {

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { TimeLog } from '../api/timeLogs';
+import { TimeLog } from '../api/timeLog';
 
 export const msToTime = (s: number) => {
   if (s === 0) {

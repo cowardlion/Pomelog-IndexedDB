@@ -4,7 +4,7 @@ import { CURRENT_DATE_STR, TIME_LOGS } from '../graphql/queries';
 import moment from 'moment';
 import 'moment/locale/ko';
 import { Button } from 'antd';
-import { listByDate } from '../api/timeLogs';
+import { listByDate } from '../api/timeLog';
 moment.locale('ko');
 
 type Props = {

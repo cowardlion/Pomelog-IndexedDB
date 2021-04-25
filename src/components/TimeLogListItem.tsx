@@ -5,7 +5,7 @@ import { SwapRightOutlined, EditOutlined, DeleteOutlined, SaveOutlined } from '@
 import classnames from 'classnames';
 import moment from 'moment';
 import 'moment/locale/ko';
-import type { TimeLog } from '../api/timeLogs';
+import type { TimeLog } from '../api/timeLog';
 import { msToTime } from '../utils';
 import { TIME_LOGS, useMutationRemoveLog, useMutationUpdateLog } from '../graphql/queries';
 moment.locale('ko');
