@@ -2,14 +2,30 @@ import { forwardRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Category } from '../../api/category';
+import styled from '@emotion/styled';
+
+const ItemStyled = styled.div`
+  .dragging {
+    background-color: 'red';
+  }
+
+  .emoji {
+    width: 25px;
+    cursor: pointer;
+  }
+
+  .name {
+    margin-right: 10px;
+  }
+`;
 
 export const Item = forwardRef(({ item, ...props }: any, ref: any) => {
   return (
-    <div {...props} ref={ref}>
-      <span dangerouslySetInnerHTML={{ __html: `&#x${item.emoji};` }} />
-      <strong> {item.name} </strong>
-      <small> {item.keywords.join(',')}</small>
-    </div>
+    <ItemStyled {...props} ref={ref}>
+      <span className="emoji" dangerouslySetInnerHTML={{ __html: `&#x${item.emoji};` }} />
+      <strong className="name">{item.name}</strong>
+      <small className="keyword">{item.keywords.join(', ')}</small>
+    </ItemStyled>
   );
 });
 

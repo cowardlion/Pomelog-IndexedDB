@@ -15,6 +15,7 @@ export const APP_STATES = gql`
       note
       duration
       isValid
+      category
     }
     categories @client {
       id

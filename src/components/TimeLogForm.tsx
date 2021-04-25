@@ -141,7 +141,7 @@ export const TimeLogForm = ({ dateStr, startAt, disableAutoSelect = false }: Pro
             bordered={false}
             autoFocus={true}
           />
-          <div className="category">노트를 작성하면 카테고리 설정에 따라 자동 분류됩니다.</div>
+          <div className="category">카테고리는 설정에 따라 자동 분류됩니다.</div>
         </div>
         <div className="footer">
           <div>

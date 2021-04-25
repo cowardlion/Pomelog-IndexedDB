@@ -3,7 +3,7 @@ import './App.less';
 import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import cache, { LocalCache } from './graphql/cache';
-import { CURRENT_DATE_STR, TIME_LOGS, APP_STATES } from './graphql/queries';
+import { CURRENT_DATE_STR, APP_STATES } from './graphql/queries';
 
 import { TimeLogList } from './components/TimeLogList';
 import { TimeLogForm } from './components/TimeLogForm';
@@ -23,7 +23,6 @@ function App() {
 
   const { loading, data, error } = useQuery(APP_STATES, { variables: { dateStr: currentDateStr } });
 
-  console.log('---->', error, data);
   if (loading || !!error) {
     return null;
   }

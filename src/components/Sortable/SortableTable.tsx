@@ -47,13 +47,29 @@ export function SortableTable({ categories }: Props) {
       setItems((items) => {
         const oldIndex = items.findIndex(({ id }) => id === active.id);
         const newIndex = items.findIndex(({ id }) => id === over.id);
-        console.log(active, over);
 
         return arrayMove(items, oldIndex, newIndex);
       });
     }
 
     setActiveItem(null);
+  };
+
+  const style = {
+    position: 'relative',
+    left: '-10px',
+    display: 'flex',
+    height: 50,
+    backgroundColor: 'aliceblue',
+    border: '1px dashed gray',
+    borderRadius: '3px',
+    margin: '3px 0',
+    color: '#000',
+    flexGrow: 1,
+    alignItems: 'center',
+    padding: '18px 20px',
+    fontWeight: 400,
+    fontSize: '1rem',
   };
 
   return (
@@ -69,13 +85,7 @@ export function SortableTable({ categories }: Props) {
           <SortableItem key={item.name} item={item} />
         ))}
       </SortableContext>
-      <DragOverlay style={{ position: 'relative' }}>
-        {activeItem ? (
-          <div style={{}}>
-            <Item item={activeItem} />
-          </div>
-        ) : null}
-      </DragOverlay>
+      <DragOverlay>{activeItem ? <Item item={activeItem} style={style} /> : null}</DragOverlay>
     </DndContext>
   );
 }

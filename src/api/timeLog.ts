@@ -1,12 +1,13 @@
 import moment from 'moment-timezone';
 import { db } from './database';
-import { Category } from './category';
+import { Category, list } from './category';
 
 export type TimeLog = {
   id: number;
   startAt: Date;
   endAt: Date;
   note: string;
+  catId?: number;
   category: Category;
   duration: number;
   isValid: boolean;
@@ -15,7 +16,8 @@ export type TimeLog = {
 export type InputLog = {
   startAt: Date;
   endAt?: Date;
-  note: String;
+  note: string;
+  category: Category;
 };
 
 export type MatchLog = Partial<{
@@ -23,7 +25,6 @@ export type MatchLog = Partial<{
   startAt: Date;
   endAt: Date;
   note: string;
-  category: string;
 }>;
 
 export type UpdateLog = Omit<MatchLog, 'id'>;
@@ -58,20 +59,48 @@ export const setupSampleDB = async () => {
 
 const TIME_ZONE = 'YYYY-MM-DDT00:00:00Z';
 
+const findCategoryFromNote = async (note: string): Promise<Category | undefined> => {
+  const categories = await list();
+
+  for (let i = 0; i < categories.length; ++i) {
+    const category = categories[i];
+    const isContained = category.keywords.some((keyword: string) => {
+      return -1 < note.indexOf(keyword);
+    });
+
+    if (isContained) {
+      return category;
+    }
+  }
+
+  return undefined;
+};
+
 export const listByDate = async (date = new Date()) => {
   const from = moment(date).format(TIME_ZONE);
   const to = moment(date).add(1, 'd').format(TIME_ZONE);
-  const logs = await db.table('timeLogs').where('endAt').between(new Date(from), new Date(to)).sortBy('endAt');
+
+  const categories = await list();
+  const logs = await db.table('timeLogs').where('endAt').between(new Date(from), new Date(to)).sortBy('startAt');
 
   const timeLogs = logs.map((log: TimeLog, index: number, arr: TimeLog[]) => {
-    const { ...rest } = log;
+    const { catId, ...rest } = log;
     let isValid = true;
 
     if (0 < index && arr[index - 1].endAt > log.startAt) {
       isValid = false;
     }
 
-    return { ...rest, duration: log.endAt.valueOf() - log.startAt.valueOf(), isValid };
+    if (index < arr.length - 1 && log.startAt > arr[index + 1].startAt) {
+      isValid = false;
+    }
+
+    let category = null;
+    if (catId) {
+      category = categories.find(({ id }) => catId === id);
+    }
+
+    return { ...rest, category, duration: log.endAt.valueOf() - log.startAt.valueOf(), isValid };
   });
 
   return timeLogs;
@@ -98,15 +127,25 @@ export const add = async (input: InputLog) => {
     throw new Error('기록을 위한 필수 데이터가 없습니다.');
   }
 
-  return db.table('timeLogs').add({
+  const matched = await findCategoryFromNote(note);
+
+  const log = {
     startAt,
     endAt,
     note,
-  });
+    catId: matched ? matched.id : null,
+  };
+
+  return db.table('timeLogs').add(log);
 };
 
 export const update = async (id: number, changes: UpdateLog): Promise<TimeLog> => {
-  await db.table('timeLogs').update(id, changes);
+  const { note } = changes;
+  const category = await findCategoryFromNote(note!);
+
+  await db
+    .table('timeLogs')
+    .update(id, category ? { ...changes, catId: category.id } : { ...changes, catId: undefined });
   return db.table('timeLogs').get({ id });
 };
 

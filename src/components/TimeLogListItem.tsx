@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import type { TimeLog } from '../api/timeLog';
 import { msToTime } from '../utils';
-import { TIME_LOGS, useMutationRemoveLog, useMutationUpdateLog } from '../graphql/queries';
+import { APP_STATES, useMutationRemoveLog, useMutationUpdateLog } from '../graphql/queries';
 moment.locale('ko');
 const TIME_FORMAT = 'A h:mm';
 
@@ -53,7 +53,7 @@ export const TimeLogListItem = ({
       },
       optimisticResponse: true,
       update(cache, { data: { updateLog } }) {
-        const data = cache.readQuery({ query: TIME_LOGS, variables: { dateStr } });
+        const data = cache.readQuery({ query: APP_STATES, variables: { dateStr } });
         const { timeLogs } = data as RootQuery;
 
         const newLogs = timeLogs.map((log) => {
@@ -78,7 +78,7 @@ export const TimeLogListItem = ({
       variables: { id },
       optimisticResponse: true,
       update(cache) {
-        const data = cache.readQuery({ query: TIME_LOGS, variables: { dateStr } });
+        const data = cache.readQuery({ query: APP_STATES, variables: { dateStr } });
         const { timeLogs } = data as RootQuery;
         const newLogs = timeLogs.filter((log) => log.id !== id);
 
@@ -151,7 +151,6 @@ export const TimeLogListItem = ({
               bordered={false}
               autoFocus={true}
             />
-            {!category && <small>카테고리 없음</small>}
           </div>
 
           <div className="btns">
@@ -173,7 +172,14 @@ export const TimeLogListItem = ({
               {isValid ? <span className="duration">{msToTime(duration)}</span> : <span>시간이 겹칩니다.</span>}
             </div>
             <div className="note">{note}</div>
-            {!category && <small>카테고리 없음</small>}
+            {category ? (
+              <>
+                <span className="emoji" dangerouslySetInnerHTML={{ __html: `&#x${category.emoji};` }} />
+                <small>{category.name}</small>
+              </>
+            ) : (
+              <small>카테고리 없음</small>
+            )}
           </div>
 
           <div className="meta">
@@ -236,7 +242,7 @@ const ListItemStyled = styled.li`
 
   :hover {
     transition: margin 0.2s;
-    background-color: aliceblue;
+    /* background-color: aliceblue; */
     margin-left: -10px;
   }
 
@@ -253,6 +259,11 @@ const ListItemStyled = styled.li`
 
     .note {
       flex: 1;
+    }
+
+    .emoji {
+      display: inline-block;
+      width: 25px;
     }
   }
 
