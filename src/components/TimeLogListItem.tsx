@@ -94,7 +94,7 @@ export const TimeLogListItem = ({
   };
 
   const containerClass = classnames('TimeLogList', {
-    invalid: !isValid,
+    invalid: !isValid || !category,
     editing: isEditing,
   });
 
@@ -169,7 +169,11 @@ export const TimeLogListItem = ({
               <span>{moment(startAt).format('A h:mm')}</span>
               <SwapRightOutlined className="time-dash" />
               <span>{moment(endAt).format('A h:mm')}</span>
-              {isValid ? <span className="duration">{msToTime(duration)}</span> : <span>시간이 겹칩니다.</span>}
+              {isValid ? (
+                <span className="duration">{msToTime(duration)}</span>
+              ) : (
+                <span className="time-overlap">시간이 겹칩니다.</span>
+              )}
             </div>
             <div className="note">{note}</div>
             {category ? (
@@ -192,7 +196,6 @@ export const TimeLogListItem = ({
 };
 
 const ListItemStyled = styled.li`
-  background-color: cornsilk;
   border: 1px solid #aeaeae;
   display: flex;
   justify-content: space-between;
@@ -227,7 +230,7 @@ const ListItemStyled = styled.li`
   }
 
   &.invalid {
-    background-color: goldenrod;
+    background-color: #e7ddc7;
 
     .meta {
       width: auto;
@@ -264,6 +267,11 @@ const ListItemStyled = styled.li`
     .emoji {
       display: inline-block;
       width: 25px;
+    }
+
+    .time-overlap {
+      color: #c70d0d;
+      margin-left: 10px;
     }
   }
 

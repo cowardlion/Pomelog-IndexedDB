@@ -34,6 +34,7 @@ export function SortableTable({ categories }: Props) {
   );
 
   const handleDragStart = (event: any) => {
+    console.log(event);
     const { active } = event;
     const item = categories.find(({ id }) => active.id === id) as Category;
 
@@ -56,8 +57,6 @@ export function SortableTable({ categories }: Props) {
   };
 
   const style = {
-    position: 'relative',
-    left: '-10px',
     display: 'flex',
     height: 50,
     backgroundColor: 'aliceblue',
@@ -70,6 +69,7 @@ export function SortableTable({ categories }: Props) {
     padding: '18px 20px',
     fontWeight: 400,
     fontSize: '1rem',
+    transform: 'scaleX(1.02) scaleY(1.1) translate3d(0, 0, 0)',
   };
 
   return (
